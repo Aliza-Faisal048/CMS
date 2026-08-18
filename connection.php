@@ -1,12 +1,21 @@
 <?php
-error_reporting(0);
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "cms_db";
 
-$conn = mysqli_connect($servername, $username, $password, $dbname);
+$host = getenv("MYSQLHOST");
+$port = getenv("MYSQLPORT");
+$user = getenv("MYSQLUSER");
+$password = getenv("MYSQLPASSWORD");
+$database = getenv("MYSQLDATABASE");
+
+$conn = mysqli_connect(
+    $host,
+    $user,
+    $password,
+    $database,
+    $port
+);
 
 if (!$conn) {
-    echo "Connection failed";
+    die("Database connection failed: " . mysqli_connect_error());
 }
+
+?>
