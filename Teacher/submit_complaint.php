@@ -3,36 +3,188 @@
 session_start();
 
 include "../connection.php";
+include "../ams_connection.php";
 
 include "../includes/header.php";
 include "../includes/sidebar.php";
 
 
+// =========================================
+// SESSION
+// =========================================
+
 $email = $_SESSION["email"];
 $role = $_SESSION["role"];
 
+
+// =========================================
+// VARIABLES
+// =========================================
+
+$labs = [];
+$assets = [];
 $problems = [];
 
+$selected_lab = "";
+$selected_asset_type = "";
+$selected_asset = "";
+$selected_category = "";
 
-// Get selected category
+$message = "";
+$message_type = "";
+
+
+// =========================================
+// GET LABS
+// =========================================
+
+$lab_query = "
+    SELECT lab_number FROM desktop
+    WHERE status = 'Serviceable'
+
+    UNION
+
+    SELECT lab_number FROM laptop
+    WHERE status = 'Serviceable'
+
+    UNION
+
+    SELECT lab_number FROM printer
+    WHERE status = 'Serviceable'
+
+    UNION
+
+    SELECT lab_number FROM projector
+    WHERE status = 'Serviceable'
+
+    ORDER BY lab_number
+";
+
+$lab_run = mysqli_query($ams_conn, $lab_query);
+
+if ($lab_run) {
+
+    while ($row = mysqli_fetch_assoc($lab_run)) {
+
+        $labs[] = $row["lab_number"];
+
+    }
+
+}
+
+
+// =========================================
+// KEEP SELECTED VALUES
+// =========================================
+
+if (isset($_POST["lab_number"])) {
+
+    $selected_lab = $_POST["lab_number"];
+
+}
+
+if (isset($_POST["asset_type"])) {
+
+    $selected_asset_type = $_POST["asset_type"];
+
+}
+
+if (isset($_POST["asset_id"])) {
+
+    $selected_asset = $_POST["asset_id"];
+
+}
 
 if (isset($_POST["category"])) {
 
-    $category = $_POST["category"];
+    $selected_category = $_POST["category"];
+
+}
 
 
-    // Get problems according to category and teacher role
+// =========================================
+// GET ASSETS
+// =========================================
 
-    $query = "SELECT * FROM problem_table
-              WHERE p_category='$category'
-              AND role='$role'";
+if (
+    $selected_lab != "" &&
+    $selected_asset_type != ""
+) {
 
-    $run = mysqli_query($conn, $query);
+    $allowed_asset_types = [
+        "desktop",
+        "laptop",
+        "printer",
+        "projector"
+    ];
+
+    if (in_array($selected_asset_type, $allowed_asset_types)) {
+
+        $selected_lab_safe = mysqli_real_escape_string(
+            $ams_conn,
+            $selected_lab
+        );
+
+        $asset_query = "
+            SELECT asset_tag, department
+            FROM $selected_asset_type
+            WHERE lab_number = '$selected_lab_safe'
+            AND status = 'Serviceable'
+            ORDER BY asset_tag
+        ";
+
+        $asset_run = mysqli_query(
+            $ams_conn,
+            $asset_query
+        );
+
+        if ($asset_run) {
+
+            while ($row = mysqli_fetch_assoc($asset_run)) {
+
+                $assets[] = $row;
+
+            }
+
+        }
+
+    }
+
+}
 
 
-    if (mysqli_num_rows($run) > 0) {
+// =========================================
+// GET PROBLEMS
+// =========================================
 
-        while ($row = mysqli_fetch_assoc($run)) {
+if ($selected_category != "") {
+
+    $category_safe = mysqli_real_escape_string(
+        $conn,
+        $selected_category
+    );
+
+    $role_safe = mysqli_real_escape_string(
+        $conn,
+        $role
+    );
+
+    $problem_query = "
+        SELECT id, problem_detail
+        FROM problem_table
+        WHERE p_category = '$category_safe'
+        AND role = '$role_safe'
+        ORDER BY id
+    ";
+
+    $problem_run = mysqli_query(
+        $conn,
+        $problem_query
+    );
+
+    if ($problem_run) {
+
+        while ($row = mysqli_fetch_assoc($problem_run)) {
 
             $problems[] = $row;
 
@@ -43,34 +195,491 @@ if (isset($_POST["category"])) {
 }
 
 
-// Submit complaint
+// =========================================
+// SUBMIT COMPLAINT
+// =========================================
 
 if (isset($_POST["submit-btn"])) {
 
-    $c_category = $_POST["category"];
 
-    $c_detail = $_POST["problem"];
+    $lab_number = $_POST["lab_number"] ?? "";
+    $asset_type = $_POST["asset_type"] ?? "";
+    $asset_id = $_POST["asset_id"] ?? "";
+    $category = $_POST["category"] ?? "";
+    $description = trim($_POST["description"] ?? "");
 
-    $c_description = $_POST["description"];
+    $selected_problems = $_POST["problems"] ?? [];
+
+    $other_selected = isset($_POST["other_problem"]);
+
+    $other_description = trim(
+        $_POST["other_description"] ?? ""
+    );
 
 
-    $query = "INSERT INTO complaints
-              (email, c_category, c_detail, c_description, role)
-              VALUES
-              ('$email', '$c_category', '$c_detail', '$c_description', '$role')";
+    // =====================================
+    // VALIDATION
+    // =====================================
 
+    if (
+        $lab_number == "" ||
+        $asset_type == "" ||
+        $asset_id == "" ||
+        $category == ""
+    ) {
 
-    $run = mysqli_query($conn, $query);
+        $message = "Please complete all required selections.";
 
-
-    if ($run) {
-
-        echo "Complaint submitted successfully";
+        $message_type = "danger";
 
     }
+
+    elseif (
+        count($selected_problems) == 0 &&
+        !$other_selected
+    ) {
+
+        $message = "Please select at least one problem.";
+
+        $message_type = "danger";
+
+    }
+
+    elseif (
+        $other_selected &&
+        $other_description == ""
+    ) {
+
+        $message = "Please describe the other problem.";
+
+        $message_type = "danger";
+
+    }
+
     else {
 
-        echo "Complaint not submitted";
+
+        // =================================
+        // VALIDATE ASSET TYPE
+        // =================================
+
+        $allowed_asset_types = [
+            "desktop",
+            "laptop",
+            "printer",
+            "projector"
+        ];
+
+
+        if (!in_array($asset_type, $allowed_asset_types)) {
+
+            $message = "Invalid asset type.";
+
+            $message_type = "danger";
+
+        }
+
+        else {
+
+
+            // =================================
+            // GET ASSET FROM AMS
+            // =================================
+
+            $asset_id_safe = mysqli_real_escape_string(
+                $ams_conn,
+                $asset_id
+            );
+
+            $asset_query = "
+                SELECT asset_tag, department
+                FROM $asset_type
+                WHERE asset_tag = '$asset_id_safe'
+                AND lab_number = '$lab_number'
+                AND status = 'Serviceable'
+                LIMIT 1
+            ";
+
+            $asset_run = mysqli_query(
+                $ams_conn,
+                $asset_query
+            );
+
+
+            if (
+                !$asset_run ||
+                mysqli_num_rows($asset_run) == 0
+            ) {
+
+                $message = "The selected asset could not be found.";
+
+                $message_type = "danger";
+
+            }
+
+            else {
+
+
+                $asset = mysqli_fetch_assoc(
+                    $asset_run
+                );
+
+                $department = $asset["department"];
+
+
+                // =================================
+                // ESCAPE VALUES
+                // =================================
+
+                $email_safe = mysqli_real_escape_string(
+                    $conn,
+                    $email
+                );
+
+                $role_safe = mysqli_real_escape_string(
+                    $conn,
+                    $role
+                );
+
+                $lab_safe = mysqli_real_escape_string(
+                    $conn,
+                    $lab_number
+                );
+
+                $asset_type_safe = mysqli_real_escape_string(
+                    $conn,
+                    $asset_type
+                );
+
+                $asset_id_safe_cms = mysqli_real_escape_string(
+                    $conn,
+                    $asset_id
+                );
+
+                $category_safe = mysqli_real_escape_string(
+                    $conn,
+                    $category
+                );
+
+                $description_safe = mysqli_real_escape_string(
+                    $conn,
+                    $description
+                );
+
+                $department_safe = mysqli_real_escape_string(
+                    $conn,
+                    $department
+                );
+
+
+                // =================================
+                // GENERATE UNIQUE COMPLAINT CODE
+                // =================================
+
+                $year = date("Y");
+
+                $asset_type_name = ucfirst($asset_type);
+
+
+                // Get the highest existing sequence for this
+                // asset and current year
+
+                $prefix = $department . "-" .
+                        $asset_type_name . "-" .
+                        $asset_id . "-" .
+                        $year . "-";
+
+
+                $prefix_safe = mysqli_real_escape_string(
+                    $conn,
+                    $prefix
+                );
+
+
+                $sequence_query = "
+                    SELECT complaint_code
+                    FROM complaints
+                    WHERE complaint_code LIKE '$prefix_safe%'
+                    ORDER BY id DESC
+                    LIMIT 1
+                ";
+
+
+                $sequence_run = mysqli_query(
+                    $conn,
+                    $sequence_query
+                );
+
+
+                $sequence = 1;
+
+
+                if (
+                    $sequence_run &&
+                    mysqli_num_rows($sequence_run) > 0
+                ) {
+
+                    $sequence_row =
+                        mysqli_fetch_assoc(
+                            $sequence_run
+                        );
+
+
+                    $existing_code =
+                        $sequence_row["complaint_code"];
+
+
+                    /*
+                    * Extract the number after the final "-"
+                    *
+                    * Example:
+                    *
+                    * CS-Desktop-PC-002-2026-01
+                    *
+                    * Result:
+                    *
+                    * 01
+                    */
+
+                    $parts = explode(
+                        "-",
+                        $existing_code
+                    );
+
+
+                    $last_part =
+                        end($parts);
+
+
+                    if (is_numeric($last_part)) {
+
+                        $sequence =
+                            intval($last_part) + 1;
+
+                    }
+
+                }
+
+
+                $sequence = str_pad(
+                    $sequence,
+                    2,
+                    "0",
+                    STR_PAD_LEFT
+                );
+
+
+                $complaint_code =
+                    $prefix .
+                    $sequence;
+
+
+                // =================================
+                // CREATE SUBJECT
+                // =================================
+
+                $subject = "IT Complaint";
+
+
+                // =================================
+                // INSERT COMPLAINT
+                // =================================
+
+                $insert_query = "
+                    INSERT INTO complaints
+                    (
+                        complaint_code,
+                        email,
+                        c_subject,
+                        c_category,
+                        asset_id,
+                        c_detail,
+                        c_description,
+                        status,
+                        role,
+                        lab_number,
+                        asset_type
+                    )
+                    VALUES
+                    (
+                        '$complaint_code',
+                        '$email_safe',
+                        '$subject',
+                        '$category_safe',
+                        '$asset_id_safe_cms',
+                        '',
+                        '$description_safe',
+                        'Unassigned',
+                        '$role_safe',
+                        '$lab_safe',
+                        '$asset_type_safe'
+                    )
+                ";
+
+
+                $insert_run = mysqli_query(
+                    $conn,
+                    $insert_query
+                );
+
+
+                if (!$insert_run) {
+
+                    $message =
+                        "Complaint could not be submitted: "
+                        . mysqli_error($conn);
+
+                    $message_type = "danger";
+
+                }
+
+                else {
+
+
+                    // =================================
+                    // GET COMPLAINT ID
+                    // =================================
+
+                    $complaint_id = mysqli_insert_id(
+                        $conn
+                    );
+
+
+                    // =================================
+                    // SAVE SELECTED PROBLEMS
+                    // =================================
+
+                    foreach (
+                        $selected_problems
+                        as $problem
+                    ) {
+
+                        $problem_safe =
+                            mysqli_real_escape_string(
+                                $conn,
+                                $problem
+                            );
+
+
+                        $problem_insert = "
+                            INSERT INTO complaint_problems
+                            (
+                                complaint_id,
+                                problem_detail
+                            )
+                            VALUES
+                            (
+                                '$complaint_id',
+                                '$problem_safe'
+                            )
+                        ";
+
+
+                        mysqli_query(
+                            $conn,
+                            $problem_insert
+                        );
+
+                    }
+
+
+                    // =================================
+                    // SAVE OTHER PROBLEM
+                    // =================================
+
+                    if ($other_selected) {
+
+                        $other_safe =
+                            mysqli_real_escape_string(
+                                $conn,
+                                "Other: " .
+                                $other_description
+                            );
+
+
+                        $other_insert = "
+                            INSERT INTO complaint_problems
+                            (
+                                complaint_id,
+                                problem_detail
+                            )
+                            VALUES
+                            (
+                                '$complaint_id',
+                                '$other_safe'
+                            )
+                        ";
+
+
+                        mysqli_query(
+                            $conn,
+                            $other_insert
+                        );
+
+                    }
+
+
+                    // =================================
+                    // STATUS HISTORY
+                    // =================================
+
+                    $history_email = mysqli_real_escape_string(
+                        $conn,
+                        $email
+                    );
+
+
+                    $history_query = "
+                        INSERT INTO complaint_status_history
+                        (
+                            complaint_id,
+                            status,
+                            changed_by,
+                            remarks
+                        )
+                        VALUES
+                        (
+                            '$complaint_id',
+                            'Unassigned',
+                            '$history_email',
+                            'Complaint submitted and waiting for IT staff assignment'
+                        )
+                    ";
+
+
+                    mysqli_query(
+                        $conn,
+                        $history_query
+                    );
+
+
+                    // =================================
+                    // SUCCESS
+                    // =================================
+
+                    $message =
+                        "Complaint submitted successfully! "
+                        . "Complaint ID: "
+                        . $complaint_code;
+
+                    $message_type = "success";
+
+
+                    // Clear form
+
+                    $selected_lab = "";
+                    $selected_asset_type = "";
+                    $selected_asset = "";
+                    $selected_category = "";
+
+                    $assets = [];
+                    $problems = [];
+
+                }
+
+            }
+
+        }
 
     }
 
@@ -82,18 +691,20 @@ if (isset($_POST["submit-btn"])) {
 <div class="main-content">
 
 
-    <!-- TOP HEADER -->
+    <!-- =====================================
+         TOP HEADER
+    ====================================== -->
 
     <div class="top-header">
 
         <div>
 
             <h4 class="mb-1">
-                Submit Complaint
+                Launch IT Complaint
             </h4>
 
             <small class="text-muted">
-                Submit a new complaint
+                Report a problem with an IT asset
             </small>
 
         </div>
@@ -102,130 +713,77 @@ if (isset($_POST["submit-btn"])) {
 
 
 
-    <!-- FORM -->
+    <!-- =====================================
+         MESSAGE
+    ====================================== -->
+
+    <?php if ($message != "") { ?>
+
+        <div class="alert alert-<?php echo $message_type; ?>">
+
+            <?php echo htmlspecialchars($message); ?>
+
+        </div>
+
+    <?php } ?>
+
+
+
+    <!-- =====================================
+         FORM
+    ====================================== -->
 
     <div class="content-card">
-
 
         <h4 class="mb-4">
             Complaint Details
         </h4>
 
 
-        <form
-            method="POST"
-            onsubmit="return validateComplaintForm();">
+        <form method="POST">
 
 
-            <!-- Category -->
+            <!-- =================================
+                 LAB
+            ================================== -->
 
-            <div class="mb-3">
+            <div class="mb-4">
 
                 <label class="form-label">
-                    Category
+                    Select Lab
                 </label>
 
 
                 <select
-                    name="category"
+                    name="lab_number"
                     class="form-select"
-                    onchange="this.form.submit()">
-
+                    onchange="this.form.submit()"
+                    required>
 
                     <option value="">
-                        Select Category
+                        Select Lab
                     </option>
 
 
-                    <option
-                        value="Academic"
-                        <?php
+                    <?php foreach ($labs as $lab) { ?>
 
-                        if (
-                            isset($_POST["category"])
-                            && $_POST["category"] == "Academic"
-                        ) {
-                            echo "selected";
-                        }
+                        <option
+                            value="<?php echo htmlspecialchars($lab); ?>"
+                            <?php
 
-                        ?>>
+                            if (
+                                $selected_lab == $lab
+                            ) {
+                                echo "selected";
+                            }
 
-                        Academic
+                            ?>>
 
-                    </option>
+                            Lab <?php echo htmlspecialchars($lab); ?>
 
+                        </option>
 
-                    <option
-                        value="Examination"
-                        <?php
-
-                        if (
-                            isset($_POST["category"])
-                            && $_POST["category"] == "Examination"
-                        ) {
-                            echo "selected";
-                        }
-
-                        ?>>
-
-                        Examination
-
-                    </option>
-
-
-                    <option
-                        value="Hostel"
-                        <?php
-
-                        if (
-                            isset($_POST["category"])
-                            && $_POST["category"] == "Hostel"
-                        ) {
-                            echo "selected";
-                        }
-
-                        ?>>
-
-                        Hostel
-
-                    </option>
-
-
-                    <option
-                        value="Facilities"
-                        <?php
-
-                        if (
-                            isset($_POST["category"])
-                            && $_POST["category"] == "Facilities"
-                        ) {
-                            echo "selected";
-                        }
-
-                        ?>>
-
-                        Facilities
-
-                    </option>
-
-
-                    <option
-                        value="IT"
-                        <?php
-
-                        if (
-                            isset($_POST["category"])
-                            && $_POST["category"] == "IT"
-                        ) {
-                            echo "selected";
-                        }
-
-                        ?>>
-
-                        IT / Technical
-
-                    </option>
-
+                    <?php } ?>
 
                 </select>
 
@@ -233,58 +791,285 @@ if (isset($_POST["submit-btn"])) {
 
 
 
-            <!-- PROBLEM -->
+            <!-- =================================
+                 ASSET TYPE
+            ================================== -->
 
-            <?php
+            <?php if ($selected_lab != "") { ?>
 
-            if (
-                isset($_POST["category"])
-                && $_POST["category"] != ""
-            ) {
-
-            ?>
-
-                <div class="mb-3">
+                <div class="mb-4">
 
                     <label class="form-label">
-
-                        <?php echo $_POST["category"]; ?> Problem
-
+                        Select Asset Type
                     </label>
 
 
                     <select
-                        name="problem"
+                        name="asset_type"
                         class="form-select"
+                        onchange="this.form.submit()"
                         required>
 
-
                         <option value="">
+                            Select Asset Type
+                        </option>
 
-                            Select Problem
+
+                        <option
+                            value="desktop"
+                            <?php
+
+                            if (
+                                $selected_asset_type ==
+                                "desktop"
+                            ) {
+                                echo "selected";
+                            }
+
+                            ?>>
+
+                            Desktop
 
                         </option>
 
 
-                        <?php
+                        <option
+                            value="laptop"
+                            <?php
 
-                        foreach ($problems as $problem) {
+                            if (
+                                $selected_asset_type ==
+                                "laptop"
+                            ) {
+                                echo "selected";
+                            }
 
-                        ?>
+                            ?>>
+
+                            Laptop
+
+                        </option>
+
+
+                        <option
+                            value="printer"
+                            <?php
+
+                            if (
+                                $selected_asset_type ==
+                                "printer"
+                            ) {
+                                echo "selected";
+                            }
+
+                            ?>>
+
+                            Printer
+
+                        </option>
+
+
+                        <option
+                            value="projector"
+                            <?php
+
+                            if (
+                                $selected_asset_type ==
+                                "projector"
+                            ) {
+                                echo "selected";
+                            }
+
+                            ?>>
+
+                            Projector
+
+                        </option>
+
+                    </select>
+
+                </div>
+
+            <?php } ?>
+
+
+
+            <!-- =================================
+                 ASSET
+            ================================== -->
+
+            <?php
+
+            if (
+                $selected_lab != "" &&
+                $selected_asset_type != ""
+            ) {
+
+            ?>
+
+                <div class="mb-4">
+
+                    <label class="form-label">
+                        Select Asset
+                    </label>
+
+
+                    <select
+                        name="asset_id"
+                        class="form-select"
+                        onchange="this.form.submit()"
+                        required>
+
+                        <option value="">
+                            Select Asset
+                        </option>
+
+
+                        <?php foreach ($assets as $asset) { ?>
 
                             <option
-                                value="<?php echo $problem["id"]; ?>">
+                                value="<?php echo htmlspecialchars($asset["asset_tag"]); ?>"
+                                <?php
 
-                                <?php echo $problem["problem_detail"]; ?>
+                                if (
+                                    $selected_asset ==
+                                    $asset["asset_tag"]
+                                ) {
+                                    echo "selected";
+                                }
+
+                                ?>>
+
+                                <?php
+                                echo htmlspecialchars(
+                                    $asset["asset_tag"]
+                                );
+                                ?>
+
+                                -
+
+                                <?php
+                                echo htmlspecialchars(
+                                    $asset["department"]
+                                );
+                                ?>
 
                             </option>
 
-                        <?php
+                        <?php } ?>
 
-                        }
+                    </select>
 
-                        ?>
 
+                    <?php
+
+                    if (count($assets) == 0) {
+
+                    ?>
+
+                        <small class="text-danger">
+
+                            No serviceable assets found
+                            in this lab.
+
+                        </small>
+
+                    <?php
+
+                    }
+
+                    ?>
+
+                </div>
+
+            <?php
+
+            }
+
+            ?>
+
+
+
+            <!-- =================================
+                 CATEGORY
+            ================================== -->
+
+            <?php
+
+            if ($selected_asset != "") {
+
+            ?>
+
+                <div class="mb-4">
+
+                    <label class="form-label">
+                        Complaint Category
+                    </label>
+
+
+                    <select
+                        name="category"
+                        class="form-select"
+                        onchange="this.form.submit()"
+                        required>
+
+                        <option value="">
+                            Select Category
+                        </option>
+
+
+                        <option
+                            value="Hardware"
+                            <?php
+
+                            if (
+                                $selected_category ==
+                                "Hardware"
+                            ) {
+                                echo "selected";
+                            }
+
+                            ?>>
+
+                            Hardware
+
+                        </option>
+
+
+                        <option
+                            value="Software"
+                            <?php
+
+                            if (
+                                $selected_category ==
+                                "Software"
+                            ) {
+                                echo "selected";
+                            }
+
+                            ?>>
+
+                            Software
+
+                        </option>
+
+
+                        <option
+                            value="Network"
+                            <?php
+
+                            if (
+                                $selected_category ==
+                                "Network"
+                            ) {
+                                echo "selected";
+                            }
+
+                            ?>>
+
+                            Network
+
+                        </option>
 
                     </select>
 
@@ -298,58 +1083,238 @@ if (isset($_POST["submit-btn"])) {
 
 
 
-            <!-- DESCRIPTION -->
+            <!-- =================================
+                 PROBLEMS
+            ================================== -->
 
-            <div class="mb-3">
+            <?php
 
-                <label class="form-label">
+            if (
+                $selected_category != ""
+            ) {
 
-                    Description
+            ?>
 
-                </label>
+                <div class="mb-4">
+
+                    <label class="form-label">
+
+                        Select Problem(s)
+
+                    </label>
 
 
-                <textarea
-                    name="description"
-                    rows="6"
-                    class="form-control"
-                    placeholder="Describe your complaint..."
-                    required><?php
+                    <?php
 
-                    if (isset($_POST["description"])) {
+                    if (count($problems) > 0) {
 
-                        echo $_POST["description"];
+                        foreach (
+                            $problems as $problem
+                        ) {
+
+                    ?>
+
+                        <div class="form-check mb-2">
+
+                            <input
+                                type="checkbox"
+                                class="form-check-input"
+                                name="problems[]"
+                                value="<?php echo htmlspecialchars($problem["problem_detail"]); ?>"
+                                id="problem_<?php echo $problem["id"]; ?>">
+
+
+                            <label
+                                class="form-check-label"
+                                for="problem_<?php echo $problem["id"]; ?>">
+
+                                <?php
+
+                                echo htmlspecialchars(
+                                    $problem["problem_detail"]
+                                );
+
+                                ?>
+
+                            </label>
+
+                        </div>
+
+                    <?php
+
+                        }
 
                     }
 
-                    ?></textarea>
+                    else {
 
-            </div>
+                    ?>
+
+                        <div class="alert alert-warning">
+
+                            No predefined problems were found
+                            for this category.
+
+                        </div>
+
+                    <?php
+
+                    }
+
+                    ?>
+
+
+                    <!-- OTHER -->
+
+                    <div class="form-check mb-3">
+
+                        <input
+                            type="checkbox"
+                            class="form-check-input"
+                            name="other_problem"
+                            id="other_problem"
+                            onchange="toggleOther()"> 
+
+
+                        <label
+                            class="form-check-label"
+                            for="other_problem">
+
+                            Other
+
+                        </label>
+
+                    </div>
+
+
+                    <div
+                        id="other_box"
+                        style="display:none;">
+
+                        <label class="form-label">
+
+                            Describe the problem
+
+                        </label>
+
+
+                        <textarea
+                            name="other_description"
+                            class="form-control"
+                            rows="4"
+                            placeholder="Describe your problem..."></textarea>
+
+                    </div>
+
+                </div>
+
+            <?php
+
+            }
+
+            ?>
 
 
 
-            <!-- SUBMIT -->
+            <!-- =================================
+                 DESCRIPTION
+            ================================== -->
 
-            <button
-                type="submit"
-                name="submit-btn"
-                class="btn btn-main">
+            <?php
 
-                <i class="bi bi-send"></i>
+            if (
+                $selected_category != ""
+            ) {
 
-                Submit Complaint
+            ?>
 
-            </button>
+                <div class="mb-4">
+
+                    <label class="form-label">
+
+                        Additional Description
+
+                    </label>
+
+
+                    <textarea
+                        name="description"
+                        class="form-control"
+                        rows="5"
+                        placeholder="Add any additional information..."><?php
+
+                        if (
+                            isset($_POST["description"])
+                        ) {
+
+                            echo htmlspecialchars(
+                                $_POST["description"]
+                            );
+
+                        }
+
+                        ?></textarea>
+
+                </div>
+
+
+
+                <!-- =================================
+                     SUBMIT
+                ================================== -->
+
+                <button
+                    type="submit"
+                    name="submit-btn"
+                    class="btn btn-main">
+
+                    <i class="bi bi-send"></i>
+
+                    Submit Complaint
+
+                </button>
+
+            <?php
+
+            }
+
+            ?>
 
 
         </form>
 
-
     </div>
-
 
 </div>
 
+
+
+<script>
+
+function toggleOther() {
+
+    var checkbox =
+        document.getElementById("other_problem");
+
+    var box =
+        document.getElementById("other_box");
+
+
+    if (checkbox.checked) {
+
+        box.style.display = "block";
+
+    }
+
+    else {
+
+        box.style.display = "none";
+
+    }
+
+}
+
+</script>
 
 
 <?php

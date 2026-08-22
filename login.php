@@ -12,15 +12,20 @@ if (isset($_SESSION["testing"])) {
 
         header("Location: Student/dashboard.php");
 
-    } 
-    elseif ($_SESSION["role"] === "admin") {
-
-        header("Location: Admin/dashboard.php");
-
     }
     elseif ($_SESSION["role"] === "teacher") {
 
         header("Location: Teacher/dashboard.php");
+
+    }
+    elseif ($_SESSION["role"] === "hr_admin") {
+
+        header("Location: Admin/dashboard.php");
+
+    }
+    elseif ($_SESSION["role"] === "it_staff") {
+
+        header("Location: IT/dashboard.php");
 
     }
     else {
@@ -71,14 +76,19 @@ if (isset($_POST["login-btn"])) {
             header("Location: Student/dashboard.php");
 
         }
-        elseif ($user["role"] === "admin") {
+        elseif ($user["role"] === "teacher") {
+
+            header("Location: Teacher/dashboard.php");
+
+        }
+        elseif ($user["role"] === "hr_admin") {
 
             header("Location: Admin/dashboard.php");
 
         }
-        elseif ($user["role"] === "teacher") {
+        elseif ($user["role"] === "it_staff") {
 
-            header("Location: Teacher/dashboard.php");
+            header("Location: IT/dashboard.php");
 
         }
         else {
@@ -115,7 +125,13 @@ if (isset($_POST["login-btn"])) {
 <body>
 
     <div class="login-card">
-        <img src="images/logo.png" alt="CMS-Logo" style="height: 50px; margin-bottom: 5px;">
+
+        <img
+            src="images/logo.png"
+            alt="CMS-Logo"
+            style="height: 50px; margin-bottom: 5px;"
+        >
+
         <h2 class="login-title">
             Complaint Management System
         </h2>
@@ -126,9 +142,11 @@ if (isset($_POST["login-btn"])) {
 
         <hr>
 
+
         <form method="POST">
 
             <!-- Email -->
+
             <div class="mb-3">
 
                 <label class="form-label">
@@ -147,6 +165,7 @@ if (isset($_POST["login-btn"])) {
 
 
             <!-- Password -->
+
             <div class="mb-3">
 
                 <label class="form-label">
@@ -165,13 +184,18 @@ if (isset($_POST["login-btn"])) {
 
 
             <!-- Role -->
+
             <div class="mb-4">
 
                 <label class="form-label">
                     Role
                 </label>
 
-                <select name="role" class="form-select" required>
+                <select
+                    name="role"
+                    class="form-select"
+                    required
+                >
 
                     <option value="">
                         Choose your role
@@ -185,8 +209,12 @@ if (isset($_POST["login-btn"])) {
                         Teacher
                     </option>
 
-                    <option value="admin">
-                        Admin
+                    <option value="hr_admin">
+                        HR Admin
+                    </option>
+
+                    <option value="it_staff">
+                        IT Staff
                     </option>
 
                 </select>
@@ -195,22 +223,29 @@ if (isset($_POST["login-btn"])) {
 
 
             <!-- Login Button -->
+
             <button
                 type="submit"
                 name="login-btn"
                 class="login-button"
             >
+
                 Sign In
+
             </button>
 
         </form>
 
+
         <p class="footer-text">
+
             University Complaint Management System
             &copy; <?php echo date("Y"); ?>
+
         </p>
 
     </div>
+
 
     <script src="js/bootstrap.bundle.min.js"></script>
 

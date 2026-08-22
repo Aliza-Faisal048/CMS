@@ -1,0 +1,1352 @@
+/* =========================================================
+   COMPLAINT MANAGEMENT SYSTEM
+   IT STAFF PANEL
+   =========================================================
+
+   DESIGN:
+   - Dark Navbar
+   - Dark Sidebar
+   - Light Main Content
+   - Blue + Purple Accent
+   - White Cards
+   - Color-coded Complaint Status
+   - Responsive Layout
+
+   ========================================================= */
+
+
+/* =========================================================
+   GLOBAL RESET
+   ========================================================= */
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
+}
+
+body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    color: #334155;
+    background: #f5f7fb;
+}
+
+
+/* =========================================================
+   NAVBAR
+   ========================================================= */
+
+.top-navbar {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+
+    width: 100% !important;
+    height: 70px !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+
+    padding: 0 28px !important;
+
+    background: #111827 !important;
+    border-bottom: 1px solid #273449 !important;
+
+    box-shadow:
+        0 4px 18px rgba(15, 23, 42, 0.25) !important;
+
+    z-index: 2000 !important;
+}
+
+
+/* =========================================================
+   NAVBAR LOGO
+   ========================================================= */
+
+.navbar-logo {
+    display: flex !important;
+    align-items: center !important;
+
+    gap: 12px !important;
+
+    color: #ffffff !important;
+
+    font-size: 17px;
+    font-weight: 600;
+
+    white-space: nowrap;
+}
+
+.navbar-logo img {
+    width: 42px !important;
+    height: 42px !important;
+
+    object-fit: contain;
+
+    border-radius: 8px;
+
+    flex-shrink: 0;
+}
+
+
+/* =========================================================
+   LOGOUT BUTTON
+   ========================================================= */
+
+.logout-btn {
+    display: inline-flex !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    gap: 8px !important;
+
+    padding: 9px 16px !important;
+
+    color: #e2e8f0 !important;
+
+    background: #1e293b !important;
+
+    border: 1px solid #334155 !important;
+
+    border-radius: 8px !important;
+
+    text-decoration: none !important;
+
+    white-space: nowrap;
+
+    transition: all 0.2s ease;
+}
+
+.logout-btn:hover {
+    color: #ffffff !important;
+
+    background:
+        linear-gradient(
+            135deg,
+            #2563eb,
+            #7c3aed
+        ) !important;
+
+    border-color: transparent !important;
+
+    transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   SIDEBAR
+   ========================================================= */
+
+.sidebar {
+    position: fixed !important;
+
+    top: 70px !important;
+    left: 0 !important;
+    bottom: 0 !important;
+
+    width: 245px !important;
+
+    height: calc(100vh - 70px) !important;
+
+    margin: 0 !important;
+
+    padding: 18px 14px !important;
+
+    background: #111827 !important;
+
+    border-right: 1px solid #273449 !important;
+
+    box-shadow:
+        4px 0 20px rgba(15, 23, 42, 0.20) !important;
+
+    z-index: 1500 !important;
+
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+}
+
+
+/* =========================================================
+   SIDEBAR PROFILE
+   ========================================================= */
+
+.sidebar-profile {
+    display: flex !important;
+
+    flex-direction: column !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    text-align: center !important;
+
+    width: 100%;
+
+    padding: 18px 10px !important;
+
+    margin: 0 0 10px 0 !important;
+
+    border-bottom: 1px solid #273449 !important;
+
+    background: transparent !important;
+}
+
+
+/* Profile Image */
+
+.sidebar-profile img {
+    display: block !important;
+
+    width: 72px !important;
+    height: 72px !important;
+
+    min-width: 72px !important;
+    min-height: 72px !important;
+
+    object-fit: cover !important;
+
+    border-radius: 50% !important;
+
+    border: 3px solid #6366f1 !important;
+
+    background: #1e293b !important;
+
+    margin: 0 0 10px 0 !important;
+}
+
+
+/* Profile Placeholder */
+
+.profile-placeholder {
+    width: 72px !important;
+    height: 72px !important;
+
+    min-width: 72px !important;
+    min-height: 72px !important;
+
+    display: flex !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    margin: 0 0 10px 0 !important;
+
+    color: #ffffff !important;
+
+    background: #1e293b !important;
+
+    border: 3px solid #6366f1 !important;
+
+    border-radius: 50% !important;
+
+    font-size: 27px;
+}
+
+
+/* Staff Name */
+
+.sidebar-profile h6 {
+    width: 100% !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    color: #f1f5f9 !important;
+
+    font-size: 13px !important;
+
+    font-weight: 600 !important;
+
+    line-height: 1.4;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+    white-space: nowrap;
+}
+
+
+/* Staff Role */
+
+.sidebar-profile small {
+    display: block !important;
+
+    margin-top: 4px !important;
+
+    color: #94a3b8 !important;
+
+    font-size: 11px !important;
+
+    line-height: 1.4;
+
+    text-transform: capitalize;
+}
+
+
+/* =========================================================
+   SIDEBAR HEADER
+   ========================================================= */
+
+.sidebar-header {
+    width: 100%;
+
+    padding: 8px 10px 18px !important;
+
+    margin: 0 0 15px 0 !important;
+
+    border-bottom: 1px solid #273449 !important;
+
+    background: transparent !important;
+}
+
+.sidebar-header h4 {
+    margin: 0;
+
+    color: #f8fafc !important;
+
+    font-size: 18px;
+
+    font-weight: 700;
+}
+
+.sidebar-header p {
+    margin: 5px 0 0;
+
+    color: #94a3b8 !important;
+
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   SIDEBAR MENU
+   ========================================================= */
+
+.sidebar-menu {
+    display: flex !important;
+
+    flex-direction: column !important;
+
+    gap: 5px !important;
+
+    width: 100%;
+
+    margin: 10px 0 0 0 !important;
+
+    padding: 0 !important;
+}
+
+.sidebar-menu a {
+    position: relative;
+
+    display: flex !important;
+
+    align-items: center !important;
+
+    gap: 12px !important;
+
+    width: 100% !important;
+
+    padding: 12px 13px !important;
+
+    margin: 0 !important;
+
+    color: #aeb9ca !important;
+
+    background: transparent !important;
+
+    border: none !important;
+
+    border-radius: 8px !important;
+
+    text-decoration: none !important;
+
+    font-size: 14px !important;
+
+    line-height: 1.4;
+
+    transition: all 0.25s ease;
+}
+
+
+/* Sidebar Icons */
+
+.sidebar-menu a i {
+    width: 20px !important;
+
+    min-width: 20px !important;
+
+    flex-shrink: 0;
+
+    text-align: center;
+
+    color: #94a3b8 !important;
+
+    font-size: 17px !important;
+}
+
+
+/* Hover */
+
+.sidebar-menu a:hover {
+    color: #ffffff !important;
+
+    background: #1e293b !important;
+
+    transform: translateX(3px);
+}
+
+.sidebar-menu a:hover i {
+    color: #93c5fd !important;
+}
+
+
+/* =========================================================
+   ACTIVE SIDEBAR LINK
+   ========================================================= */
+
+.sidebar-menu a.active {
+    color: #ffffff !important;
+
+    background:
+        linear-gradient(
+            135deg,
+            #2563eb,
+            #6d28d9
+        ) !important;
+
+    box-shadow:
+        0 6px 18px rgba(37, 99, 235, 0.20);
+
+    transform: translateX(4px);
+}
+
+
+/* Active Icon */
+
+.sidebar-menu a.active i {
+    color: #ffffff !important;
+}
+
+
+/* Active Indicator */
+
+.sidebar-menu a.active::before {
+    content: "";
+
+    position: absolute;
+
+    left: 0;
+
+    top: 10px;
+    bottom: 10px;
+
+    width: 4px;
+
+    border-radius: 0 5px 5px 0;
+
+    background: #ffffff;
+}
+
+
+/* =========================================================
+   MAIN CONTENT
+   ========================================================= */
+
+.main-content {
+    position: relative !important;
+
+    display: block !important;
+
+    width: auto !important;
+
+    min-height: 100vh !important;
+
+    margin-left: 245px !important;
+
+    padding:
+        95px
+        32px
+        40px
+        32px !important;
+
+    background: #f5f7fb !important;
+}
+
+
+/* =========================================================
+   TOP HEADER
+   ========================================================= */
+
+.top-header {
+    display: flex !important;
+
+    align-items: center !important;
+
+    justify-content: space-between !important;
+
+    width: 100%;
+
+    padding: 22px 25px;
+
+    margin: 0 0 24px 0;
+
+    background: #ffffff;
+
+    border: 1px solid #e2e8f0;
+
+    border-radius: 12px;
+
+    box-shadow:
+        0 4px 15px rgba(15, 23, 42, 0.04);
+}
+
+.top-header h4 {
+    margin: 0 0 4px 0;
+
+    color: #172033;
+
+    font-weight: 700;
+}
+
+.top-header small {
+    color: #64748b !important;
+}
+
+.top-header > div:last-child {
+    color: #4f46e5;
+
+    flex-shrink: 0;
+}
+
+
+/* =========================================================
+   CONTENT CARDS
+   ========================================================= */
+
+.content-card {
+    width: 100%;
+
+    padding: 24px;
+
+    margin: 0 0 24px 0;
+
+    background: #ffffff;
+
+    border: 1px solid #e2e8f0;
+
+    border-radius: 12px;
+
+    box-shadow:
+        0 4px 15px rgba(15, 23, 42, 0.04);
+}
+
+.content-card h2,
+.content-card h3,
+.content-card h4,
+.content-card h5 {
+    color: #172033;
+}
+
+.content-card p {
+    color: #64748b;
+}
+
+
+/* =========================================================
+   STATISTICS CARDS
+   ========================================================= */
+
+.stat-card {
+    position: relative;
+
+    overflow: hidden;
+
+    width: 100%;
+
+    min-height: 125px;
+
+    padding: 22px;
+
+    background: #ffffff;
+
+    border: 1px solid #e2e8f0;
+
+    border-radius: 12px;
+
+    box-shadow:
+        0 4px 15px rgba(15, 23, 42, 0.04);
+
+    transition: all 0.2s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+
+    box-shadow:
+        0 9px 22px rgba(15, 23, 42, 0.08);
+}
+
+.stat-card p {
+    color: #64748b !important;
+
+    font-size: 14px;
+}
+
+.stat-card h2,
+.stat-card h3,
+.stat-card h4 {
+    color: #172033;
+
+    font-weight: 700;
+}
+
+
+/* Decorative Circle */
+
+.stat-card::after {
+    content: "";
+
+    position: absolute;
+
+    width: 90px;
+    height: 90px;
+
+    top: -35px;
+    right: -35px;
+
+    border-radius: 50%;
+
+    background: rgba(99, 102, 241, 0.06);
+}
+
+
+/* =========================================================
+   STAT ICON
+   ========================================================= */
+
+.stat-icon {
+    width: 48px;
+    height: 48px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    color: #ffffff;
+
+    background:
+        linear-gradient(
+            135deg,
+            #2563eb,
+            #7c3aed
+        );
+
+    border-radius: 11px;
+
+    box-shadow:
+        0 5px 14px rgba(79, 70, 229, 0.18);
+}
+
+.stat-icon i {
+    font-size: 20px;
+}
+
+
+/* =========================================================
+   FORMS
+   ========================================================= */
+
+.form-label {
+    color: #334155;
+
+    font-weight: 600;
+}
+
+.form-control,
+.form-select {
+    color: #334155 !important;
+
+    background-color: #ffffff !important;
+
+    border: 1px solid #cbd5e1 !important;
+
+    border-radius: 8px;
+
+    padding: 10px 12px;
+}
+
+.form-control::placeholder {
+    color: #94a3b8;
+}
+
+.form-control:focus,
+.form-select:focus {
+    color: #334155 !important;
+
+    background-color: #ffffff !important;
+
+    border-color: #6366f1 !important;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(99, 102, 241, 0.12) !important;
+}
+
+.form-select option {
+    color: #334155;
+
+    background: #ffffff;
+}
+
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+
+.btn-main,
+.btn-primary {
+    color: #ffffff !important;
+
+    background:
+        linear-gradient(
+            135deg,
+            #2563eb,
+            #7c3aed
+        ) !important;
+
+    border: none !important;
+
+    border-radius: 8px;
+
+    padding: 9px 17px;
+
+    box-shadow:
+        0 5px 14px
+        rgba(79, 70, 229, 0.16);
+
+    transition: all 0.2s ease;
+}
+
+.btn-main:hover,
+.btn-primary:hover {
+    color: #ffffff !important;
+
+    background:
+        linear-gradient(
+            135deg,
+            #1d4ed8,
+            #6d28d9
+        ) !important;
+
+    transform: translateY(-1px);
+}
+
+
+/* Secondary */
+
+.btn-secondary {
+    color: #ffffff !important;
+
+    background: #475569 !important;
+
+    border: 1px solid #475569 !important;
+
+    border-radius: 8px;
+}
+
+.btn-secondary:hover {
+    background: #334155 !important;
+}
+
+
+/* Danger */
+
+.btn-danger {
+    color: #ffffff !important;
+
+    background: #dc2626 !important;
+
+    border-color: #dc2626 !important;
+
+    border-radius: 7px;
+}
+
+.btn-danger:hover {
+    background: #b91c1c !important;
+
+    border-color: #b91c1c !important;
+}
+
+
+/* Outline Primary */
+
+.btn-outline-primary {
+    color: #4f46e5 !important;
+
+    background: #ffffff !important;
+
+    border: 1px solid #6366f1 !important;
+
+    border-radius: 7px;
+}
+
+.btn-outline-primary:hover {
+    color: #ffffff !important;
+
+    background: #4f46e5 !important;
+
+    border-color: #4f46e5 !important;
+}
+
+
+/* =========================================================
+   TABLE
+   ========================================================= */
+
+.table {
+    width: 100%;
+
+    color: #334155 !important;
+
+    margin-bottom: 0;
+}
+
+.table thead {
+    background:
+        linear-gradient(
+            90deg,
+            #1e3a8a,
+            #4c1d95
+        );
+}
+
+.table thead th {
+    color: #ffffff !important;
+
+    border-color: #334155 !important;
+
+    font-weight: 600;
+
+    white-space: nowrap;
+}
+
+.table tbody tr {
+    background: #ffffff;
+
+    transition: background 0.15s ease;
+}
+
+.table tbody tr:hover {
+    background: #f8fafc;
+}
+
+.table td {
+    color: #475569 !important;
+
+    border-color: #e2e8f0 !important;
+
+    vertical-align: middle;
+}
+
+
+/* =========================================================
+   RESPONSIVE TABLE
+   ========================================================= */
+
+.table-responsive {
+    width: 100%;
+
+    overflow-x: auto;
+
+    background: #ffffff;
+
+    border: 1px solid #e2e8f0;
+
+    border-radius: 12px;
+}
+
+.table-responsive .table {
+    width: 100%;
+
+    margin-bottom: 0;
+
+    background: #ffffff;
+}
+
+.table-responsive .table thead th {
+    padding: 14px 15px;
+
+    color: #ffffff !important;
+
+    background: transparent;
+
+    border-color: #334155 !important;
+
+    font-size: 0.82rem;
+
+    font-weight: 600;
+
+    white-space: nowrap;
+}
+
+.table-responsive .table tbody td {
+    padding: 13px 15px;
+
+    color: #475569 !important;
+
+    background: #ffffff;
+
+    border-color: #e2e8f0 !important;
+
+    font-size: 0.88rem;
+
+    vertical-align: middle;
+}
+
+.table-responsive .table tbody tr:hover td {
+    color: #172033 !important;
+
+    background: #f8fafc;
+}
+
+.table-responsive .btn {
+    border-radius: 7px;
+
+    font-size: 0.78rem;
+
+    font-weight: 600;
+
+    padding: 6px 10px;
+}
+
+
+/* =========================================================
+   STATUS BADGES
+   ========================================================= */
+
+.status-badge {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 5px 11px;
+
+    border-radius: 20px;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    white-space: nowrap;
+}
+
+
+/* Pending */
+
+.status-pending {
+    color: #b45309 !important;
+
+    background: #fff7ed;
+
+    border: 1px solid #fed7aa;
+}
+
+
+/* In Progress */
+
+.status-progress {
+    color: #6d28d9 !important;
+
+    background: #f5f3ff;
+
+    border: 1px solid #ddd6fe;
+}
+
+
+/* Resolved */
+
+.status-resolved {
+    color: #15803d !important;
+
+    background: #f0fdf4;
+
+    border: 1px solid #bbf7d0;
+}
+
+
+/* Unserviceable */
+
+.status-unserviceable {
+    color: #dc2626 !important;
+
+    background: #fee2e2;
+
+    border: 1px solid #fecaca;
+}
+
+
+/* =========================================================
+   MODAL
+   ========================================================= */
+
+.modal-content {
+    border: 1px solid #e2e8f0;
+
+    border-radius: 12px;
+
+    box-shadow:
+        0 15px 40px rgba(15, 23, 42, 0.20);
+
+    overflow: hidden;
+}
+
+.modal-header {
+    color: #ffffff;
+
+    background:
+        linear-gradient(
+            90deg,
+            #1e3a8a,
+            #4c1d95
+        );
+
+    border-bottom: none;
+}
+
+.modal-header .modal-title {
+    color: #ffffff;
+
+    font-weight: 600;
+}
+
+.modal-header .btn-close {
+    filter: brightness(0) invert(1);
+
+    opacity: 0.9;
+}
+
+.modal-body {
+    background: #ffffff;
+
+    color: #334155;
+}
+
+.modal-footer {
+    background: #f8fafc;
+
+    border-top: 1px solid #e2e8f0;
+}
+
+
+/* =========================================================
+   MODAL INFORMATION BOXES
+   ========================================================= */
+
+.modal .alert {
+    border-radius: 9px;
+}
+
+.modal .bg-light {
+    background: #f8fafc !important;
+
+    border-color: #e2e8f0 !important;
+}
+
+
+/* =========================================================
+   ALERTS
+   ========================================================= */
+
+.alert {
+    border-radius: 9px;
+
+    border: 1px solid #e2e8f0;
+}
+
+
+/* =========================================================
+   LINKS
+   ========================================================= */
+
+a {
+    color: #4f46e5;
+}
+
+a:hover {
+    color: #3730a3;
+}
+
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+footer {
+    padding: 20px 0;
+
+    color: #64748b;
+}
+
+
+/* =========================================================
+   EMPTY STATE
+   ========================================================= */
+
+.empty-state {
+    padding: 50px 20px;
+
+    color: #64748b;
+
+    text-align: center;
+}
+
+.empty-state i {
+    display: block;
+
+    margin-bottom: 15px;
+
+    color: #94a3b8;
+
+    font-size: 45px;
+}
+
+.empty-state h5 {
+    color: #334155;
+
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   SCROLLBAR
+   ========================================================= */
+
+::-webkit-scrollbar {
+    width: 8px;
+
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #94a3b8;
+
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #6366f1;
+}
+
+
+/* Sidebar scrollbar */
+
+.sidebar::-webkit-scrollbar-track {
+    background: #111827;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+    background: #334155;
+
+    border-radius: 10px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+    background: #4f46e5;
+}
+
+
+/* =========================================================
+   COMPLAINT DETAILS
+   ========================================================= */
+
+.complaint-detail-box {
+    padding: 15px;
+
+    background: #f8fafc;
+
+    border: 1px solid #e2e8f0;
+
+    border-radius: 9px;
+}
+
+.complaint-detail-box strong {
+    color: #172033;
+}
+
+
+/* =========================================================
+   ADMIN REMARKS
+   ========================================================= */
+
+.admin-remarks {
+    padding: 15px;
+
+    background: #f8fafc;
+
+    border-left: 4px solid #6366f1;
+
+    border-radius: 8px;
+
+    color: #475569;
+}
+
+.admin-remarks strong {
+    color: #172033;
+}
+
+
+/* =========================================================
+   STATUS UPDATE SECTION
+   ========================================================= */
+
+.status-update-box {
+    padding: 18px;
+
+    background: #f8fafc;
+
+    border: 1px solid #e2e8f0;
+
+    border-radius: 10px;
+}
+
+.status-update-box h6 {
+    color: #172033;
+
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   RESPONSIVE — TABLET
+   ========================================================= */
+
+@media (max-width: 768px) {
+
+    .sidebar {
+        width: 210px !important;
+    }
+
+    .main-content {
+        margin-left: 210px !important;
+
+        padding:
+            95px
+            20px
+            30px
+            20px !important;
+    }
+
+    .navbar-logo span {
+        display: none;
+    }
+
+    .top-header {
+        padding: 18px;
+    }
+
+    .content-card {
+        padding: 18px;
+    }
+
+}
+
+
+/* =========================================================
+   RESPONSIVE — PHONE
+   ========================================================= */
+
+@media (max-width: 576px) {
+
+    .top-navbar {
+        height: 70px !important;
+
+        padding: 0 15px !important;
+    }
+
+    .sidebar {
+        width: 200px !important;
+
+        height: calc(100vh - 70px) !important;
+    }
+
+    .main-content {
+        margin-left: 200px !important;
+
+        padding:
+            90px
+            15px
+            25px
+            15px !important;
+    }
+
+    .navbar-logo img {
+        width: 38px !important;
+
+        height: 38px !important;
+    }
+
+    .logout-btn {
+        padding: 8px 11px !important;
+    }
+
+    .sidebar-profile img,
+    .profile-placeholder {
+        width: 62px !important;
+        height: 62px !important;
+
+        min-width: 62px !important;
+        min-height: 62px !important;
+    }
+
+    .table-responsive {
+        overflow-x: auto;
+    }
+
+    .top-header {
+        padding: 16px;
+    }
+
+    .top-header h4 {
+        font-size: 18px;
+    }
+
+    .content-card {
+        padding: 15px;
+    }
+
+}
+
+
+/* =========================================================
+   CHARTS
+   ========================================================= */
+
+.chart-card {
+    min-height: 380px;
+}
+
+.chart-container {
+    position: relative;
+
+    height: 280px;
+
+    margin-top: 20px;
+}

@@ -8,60 +8,217 @@ include "admin_header.php";
 include "admin_sidebar.php";
 
 
-$category = "";
-$email = "";
-$role = "";
+/* =========================================
+   ACCESS CONTROL
+   ========================================= */
 
+if (
+    !isset($_SESSION["user_id"]) ||
+    !isset($_SESSION["role"]) ||
+    $_SESSION["role"] !== "hr_admin"
+) {
 
-// Get filters
-
-if (isset($_GET["category"])) {
-    $category = $_GET["category"];
-}
-
-if (isset($_GET["email"])) {
-    $email = $_GET["email"];
-}
-
-if (isset($_GET["role"])) {
-    $role = $_GET["role"];
-}
-
-// Get complaints
-
-$query = "SELECT * FROM complaints WHERE 1=1";
-
-
-if ($category != "") {
-
-    $query .= " AND c_category='$category'";
+    header("Location: ../login.php");
+    exit();
 
 }
 
 
-if ($email != "") {
+/* =========================================
+   FILTER VALUES
+   ========================================= */
 
-    $query .= " AND email LIKE '%$email%'";
+$category_filter = isset($_GET["category"])
+    ? trim($_GET["category"])
+    : "";
+
+$asset_filter = isset($_GET["asset"])
+    ? trim($_GET["asset"])
+    : "";
+
+$status_filter = isset($_GET["status"])
+    ? trim($_GET["status"])
+    : "";
+
+$search = isset($_GET["search"])
+    ? trim($_GET["search"])
+    : "";
+
+
+
+/* =========================================
+   ESCAPE FILTER VALUES
+   ========================================= */
+
+$category_safe = mysqli_real_escape_string(
+    $conn,
+    $category_filter
+);
+
+$asset_safe = mysqli_real_escape_string(
+    $conn,
+    $asset_filter
+);
+
+$status_safe = mysqli_real_escape_string(
+    $conn,
+    $status_filter
+);
+
+$search_safe = mysqli_real_escape_string(
+    $conn,
+    $search
+);
+
+
+
+/* =========================================
+   GET ASSETS
+   ========================================= */
+
+$asset_query = "
+    SELECT DISTINCT asset_id
+
+    FROM complaints
+
+    WHERE asset_id IS NOT NULL
+
+    AND asset_id != ''
+
+    ORDER BY asset_id ASC
+";
+
+$asset_run = mysqli_query(
+    $conn,
+    $asset_query
+);
+
+
+
+/* =========================================
+   MAIN QUERY
+   ========================================= */
+
+$query = "
+    SELECT
+
+        c.id,
+        c.complaint_code,
+        c.email,
+        c.role,
+        c.c_category,
+        c.asset_id,
+        c.c_detail,
+        c.c_description,
+        c.status,
+        c.admin_remarks,
+        c.lab_number,
+        c.asset_type,
+
+        GROUP_CONCAT(
+            cp.problem_detail
+            SEPARATOR '|||'
+        ) AS problems
+
+    FROM complaints c
+
+    LEFT JOIN complaint_problems cp
+        ON c.id = cp.complaint_id
+
+    WHERE 1=1
+";
+
+
+
+/* =========================================
+   CATEGORY FILTER
+   ========================================= */
+
+if ($category_filter !== "") {
+
+    $query .= "
+        AND c.c_category = '$category_safe'
+    ";
 
 }
 
-if ($role != "") {
 
-    $query .= " AND role LIKE '%$role%'";
+
+/* =========================================
+   ASSET FILTER
+   ========================================= */
+
+if ($asset_filter !== "") {
+
+    $query .= "
+        AND c.asset_id = '$asset_safe'
+    ";
 
 }
 
 
-$query .= " ORDER BY id DESC";
+
+/* =========================================
+   STATUS FILTER
+   ========================================= */
+
+if ($status_filter !== "") {
+
+    $query .= "
+        AND c.status = '$status_safe'
+    ";
+
+}
 
 
-$run = mysqli_query($conn, $query);
+
+/* =========================================
+   SEARCH
+   ========================================= */
+
+if ($search !== "") {
+
+    $query .= "
+        AND (
+            c.complaint_code LIKE '%$search_safe%'
+            OR c.email LIKE '%$search_safe%'
+            OR c.asset_id LIKE '%$search_safe%'
+        )
+    ";
+
+}
+
+
+
+/* =========================================
+   GROUP + ORDER
+   ========================================= */
+
+$query .= "
+
+    GROUP BY c.id
+
+    ORDER BY c.id DESC
+
+";
+
+
+
+$run = mysqli_query(
+    $conn,
+    $query
+);
 
 ?>
 
+
+
 <div class="main-content">
 
-    <!-- TOP HEADER -->
+
+    <!-- =====================================
+         PAGE HEADER
+    ====================================== -->
 
     <div class="top-header">
 
@@ -72,28 +229,81 @@ $run = mysqli_query($conn, $query);
             </h4>
 
             <small class="text-muted">
-                View and manage student complaints
+                View and manage all student and teacher complaints
             </small>
+
+        </div>
+
+
+        <div>
+
+            <i class="bi bi-clipboard-data fs-3"></i>
 
         </div>
 
     </div>
 
 
-    <!-- FILTERS -->
+
+    <!-- =====================================
+         FILTER CARD
+    ====================================== -->
 
     <div class="content-card mb-4">
 
-        <h5 class="mb-3">
-            Filter Complaints
-        </h5>
+
+        <div class="d-flex
+                    justify-content-between
+                    align-items-center
+                    mb-3">
+
+            <h5 class="mb-0">
+
+                <i class="bi bi-funnel me-2"></i>
+
+                Filter Complaints
+
+            </h5>
+
+        </div>
+
 
 
         <form method="GET">
 
+
             <div class="row g-3">
 
-                <!-- Category -->
+
+                <!-- =================================
+                     SEARCH
+                ================================== -->
+
+                <div class="col-md-3">
+
+                    <label class="form-label">
+                        Search
+                    </label>
+
+                    <input
+                        type="text"
+                        name="search"
+                        class="form-control"
+                        placeholder="Complaint ID, email or asset"
+                        value="<?php
+                            echo htmlspecialchars(
+                                $search
+                            );
+                        ?>"
+                    >
+
+                </div>
+
+
+
+                <!-- =================================
+                     CATEGORY
+                ================================== -->
 
                 <div class="col-md-3">
 
@@ -101,128 +311,339 @@ $run = mysqli_query($conn, $query);
                         Category
                     </label>
 
-                    <select name="category" class="form-select">
+
+                    <select
+                        name="category"
+                        class="form-select"
+                    >
 
                         <option value="">
                             All Categories
                         </option>
 
-                        <option value="Academic"
+
+                        <option
+                            value="Hardware"
+
                             <?php
-                            if ($category == "Academic") {
+
+                            if (
+                                $category_filter ===
+                                "Hardware"
+                            ) {
+
                                 echo "selected";
+
                             }
-                            ?>>
-                            Academic
+
+                            ?>
+                        >
+
+                            Hardware
+
                         </option>
 
-                        <option value="Facilities"
+
+                        <option
+                            value="Software"
+
                             <?php
-                            if ($category == "Facilities") {
+
+                            if (
+                                $category_filter ===
+                                "Software"
+                            ) {
+
                                 echo "selected";
+
                             }
-                            ?>>
-                            Facilities
+
+                            ?>
+                        >
+
+                            Software
+
                         </option>
 
-                        <option value="IT"
-                            <?php
-                            if ($category == "IT") {
-                                echo "selected";
-                            }
-                            ?>>
-                            IT / Technical
-                        </option>
 
-                        <option value="Transport"
-                            <?php
-                            if ($category == "Transport") {
-                                echo "selected";
-                            }
-                            ?>>
-                            Transport
-                        </option>
+                        <option
+                            value="Network"
 
-                        <option value="Hostel"
                             <?php
-                            if ($category == "Hostel") {
+
+                            if (
+                                $category_filter ===
+                                "Network"
+                            ) {
+
                                 echo "selected";
+
                             }
-                            ?>>
-                            Hostel
+
+                            ?>
+                        >
+
+                            Network
+
                         </option>
 
                     </select>
 
                 </div>
 
-                <!-- Roles -->
+
+
+                <!-- =================================
+                     ASSET
+                ================================== -->
 
                 <div class="col-md-3">
 
                     <label class="form-label">
-                        Role
+                        Asset
                     </label>
 
-                    <select name="role" class="form-select">
+
+                    <select
+                        name="asset"
+                        class="form-select"
+                    >
 
                         <option value="">
-                            Roles
+                            All Assets
                         </option>
 
-                        <option value="Student"
-                            <?php
-                            if ($role == "Student") {
-                                echo "selected";
+
+                        <?php
+
+                        if ($asset_run) {
+
+                            while (
+                                $asset =
+                                mysqli_fetch_assoc(
+                                    $asset_run
+                                )
+                            ) {
+
+                                $asset_value =
+                                    $asset["asset_id"];
+
+                        ?>
+
+                            <option
+                                value="<?php
+                                    echo htmlspecialchars(
+                                        $asset_value
+                                    );
+                                ?>"
+
+                                <?php
+
+                                if (
+                                    $asset_filter ===
+                                    $asset_value
+                                ) {
+
+                                    echo "selected";
+
+                                }
+
+                                ?>
+                            >
+
+                                <?php
+
+                                echo htmlspecialchars(
+                                    $asset_value
+                                );
+
+                                ?>
+
+                            </option>
+
+                        <?php
+
                             }
-                            ?>>
-                            Student
+
+                        }
+
+                        ?>
+
+                    </select>
+
+                </div>
+
+
+
+                <!-- =================================
+                     STATUS
+                ================================== -->
+
+                <div class="col-md-3">
+
+                    <label class="form-label">
+                        Status
+                    </label>
+
+
+                    <select
+                        name="status"
+                        class="form-select"
+                    >
+
+                        <option value="">
+                            All Statuses
                         </option>
 
-                        <option value="Teacher"
+
+                        <option
+                            value="Unassigned"
+
                             <?php
-                            if ($role == "Teacher") {
+
+                            if (
+                                $status_filter ===
+                                "Unassigned"
+                            ) {
+
                                 echo "selected";
+
                             }
-                            ?>>
-                            Teacher
+
+                            ?>
+                        >
+
+                            Unassigned
+
+                        </option>
+
+
+                        <option
+                            value="Pending"
+
+                            <?php
+
+                            if (
+                                $status_filter ===
+                                "Pending"
+                            ) {
+
+                                echo "selected";
+
+                            }
+
+                            ?>
+                        >
+
+                            Pending
+
+                        </option>
+
+
+                        <option
+                            value="In Progress"
+
+                            <?php
+
+                            if (
+                                $status_filter ===
+                                "In Progress"
+                            ) {
+
+                                echo "selected";
+
+                            }
+
+                            ?>
+                        >
+
+                            In Progress
+
+                        </option>
+
+
+                        <option
+                            value="Resolved"
+
+                            <?php
+
+                            if (
+                                $status_filter ===
+                                "Resolved"
+                            ) {
+
+                                echo "selected";
+
+                            }
+
+                            ?>
+                        >
+
+                            Resolved
+
+                        </option>
+
+                        <option
+                            value="Unserviceable"
+
+                            <?php
+
+                            if (
+                                $status_filter ===
+                                "Unserviceable"
+                            ) {
+
+                                echo "selected";
+
+                            }
+
+                            ?>
+                        >
+
+                            Unserviceable
+
                         </option>
 
                     </select>
 
                 </div>
 
-                <!-- Email -->
-
-                <div class="col-md-4">
-
-                    <label class="form-label">
-                        Email
-                    </label>
-
-                    <input
-                        type="text"
-                        name="email"
-                        class="form-control"
-                        placeholder="Enter email"
-                        value="<?php echo $email; ?>">
-
-                </div>
 
 
-                <!-- Button -->
+                <!-- =================================
+                     BUTTONS
+                ================================== -->
 
-                <div class="col-md-2 d-flex align-items-end">
+                <div class="col-12">
+
 
                     <button
                         type="submit"
-                        class="btn btn-primary w-100">
+                        class="btn btn-primary me-2"
+                    >
 
-                        Filter
+                        <i class="bi bi-funnel me-1"></i>
+
+                        Apply Filters
 
                     </button>
 
+
+
+                    <a
+                        href="all_complaints.php"
+                        class="btn btn-outline-secondary"
+                    >
+
+                        <i class="bi bi-x-circle me-1"></i>
+
+                        Clear Filters
+
+                    </a>
+
+
                 </div>
+
 
             </div>
 
@@ -231,29 +652,82 @@ $run = mysqli_query($conn, $query);
     </div>
 
 
-    <!-- COMPLAINT TABLE -->
+
+    <!-- =====================================
+         COMPLAINT TABLE
+    ====================================== -->
 
     <div class="content-card">
 
-        <h5 class="mb-4">
-            Complaints
-        </h5>
+
+        <div class="d-flex
+                    justify-content-between
+                    align-items-center
+                    mb-3">
+
+            <h5 class="mb-0">
+
+                Complaints
+
+            </h5>
+
+
+            <?php
+
+            if ($run) {
+
+                $complaint_count =
+                    mysqli_num_rows($run);
+
+            }
+
+            else {
+
+                $complaint_count = 0;
+
+            }
+
+            ?>
+
+
+            <span class="text-muted">
+
+                <?php
+                echo $complaint_count;
+                ?>
+
+                complaint(s)
+
+            </span>
+
+
+        </div>
+
 
 
         <div class="table-responsive">
 
-            <table class="table table-bordered table-hover">
+
+            <table
+                class="
+                    table
+                    table-bordered
+                    table-hover
+                    align-middle
+                "
+            >
+
 
                 <thead>
 
                     <tr>
 
                         <th>
-                            ID
+                            Complaint ID
                         </th>
 
                         <th>
-                            Email
+                            Submitted By
                         </th>
 
                         <th>
@@ -262,6 +736,14 @@ $run = mysqli_query($conn, $query);
 
                         <th>
                             Category
+                        </th>
+
+                        <th>
+                            Asset
+                        </th>
+
+                        <th>
+                            Problem
                         </th>
 
                         <th>
@@ -277,112 +759,522 @@ $run = mysqli_query($conn, $query);
                 </thead>
 
 
+
                 <tbody>
 
-                    <?php
 
-                    if (mysqli_num_rows($run) > 0) {
+                <?php
 
-                        while ($row = mysqli_fetch_assoc($run)) {
+                if (
+                    $run &&
+                    mysqli_num_rows($run) > 0
+                ) {
 
-                    ?>
 
-                        <tr>
+                    while (
+                        $row =
+                        mysqli_fetch_assoc($run)
+                    ) {
 
-                            <td>
-                                <?php echo $row["id"]; ?>
-                            </td>
 
-                            <td>
-                                <?php echo $row["email"]; ?>
-                            </td>
+                        $status =
+                            $row["status"];
 
-                            <td>
-                                <?php echo $row["role"]; ?>
-                            </td>
 
-                            <td>
-                                <?php echo $row["c_category"]; ?>
-                            </td>
 
-                                        
-                            <td>
+                        /* =================================
+                           STATUS CLASS
+                        ================================= */
 
-                                <?php if ($row["status"] == "Pending") { ?>
+                        if (
+                            $status === ""
+                        ) {
 
-                                    <span class="status-badge status-pending">
-                                        Pending
-                                    </span>
+                            $status =
+                                "Unassigned";
 
-                                <?php } elseif ($row["status"] == "In Progress") { ?>
+                        }
 
-                                    <span class="status-badge status-progress">
-                                        In Progress
-                                    </span>
+                        elseif (
+                            $status === "Pending"
+                        ) {
 
-                                <?php } elseif ($row["status"] == "Resolved") { ?>
+                            $status_class =
+                                "status-pending";
 
-                                    <span class="status-badge status-resolved">
-                                        Resolved
-                                    </span>
+                        }
 
-                                <?php } else { ?>
+                        elseif (
+                            $status === "In Progress"
+                        ) {
 
-                                    <span class="status-badge">
-                                        <?php echo $row["status"]; ?>
-                                    </span>
+                            $status_class =
+                                "status-progress";
 
-                                <?php } ?>
+                        }
 
-                            </td>
+                        elseif (
+                            $status === "Resolved"
+                        ) {
 
-                            <td>
+                            $status_class =
+                                "status-resolved";
+
+                        }
+
+                        elseif (
+                            $status === "Unserviceable"
+                        ) {
+
+                            $status_class =
+                                "status-unserviceable";
+
+                        }
+
+                        // else {
+
+                        //     echo 'Unassigned';
+
+                        // }
+
+                ?>
+
+
+                    <tr>
+
+
+                        <!-- =========================
+                             COMPLAINT ID
+                        ========================== -->
+
+                        <td>
+
+                            <strong>
+
+                                <?php
+
+                                echo htmlspecialchars(
+                                    $row["complaint_code"]
+                                    ?: $row["id"]
+                                );
+
+                                ?>
+
+                            </strong>
+
+                        </td>
+
+
+
+                        <!-- =========================
+                             SUBMITTED BY
+                        ========================== -->
+
+                        <td>
+
+                            <?php
+
+                            echo htmlspecialchars(
+                                $row["email"]
+                            );
+
+                            ?>
+
+                        </td>
+
+
+
+                        <!-- =========================
+                             ROLE
+                        ========================== -->
+
+                        <td>
+
+                            <?php
+
+                            if (
+                                $row["role"] ===
+                                "student"
+                            ) {
+
+                                echo "Student";
+
+                            }
+
+                            elseif (
+                                $row["role"] ===
+                                "teacher"
+                            ) {
+
+                                echo "Teacher";
+
+                            }
+
+                            else {
+
+                                echo htmlspecialchars(
+                                    $row["role"]
+                                );
+
+                            }
+
+                            ?>
+
+                        </td>
+
+
+
+                        <!-- =========================
+                             CATEGORY
+                        ========================== -->
+
+                        <td>
+
+                            <?php
+
+                            echo htmlspecialchars(
+                                $row["c_category"]
+                            );
+
+                            ?>
+
+                        </td>
+
+
+
+                        <!-- =========================
+                             ASSET
+                        ========================== -->
+
+                        <td>
+
+                            <?php
+
+                            if (
+                                !empty(
+                                    $row["asset_id"]
+                                )
+                            ) {
+
+                                echo htmlspecialchars(
+                                    $row["asset_id"]
+                                );
+
+                            }
+
+                            else {
+
+                            ?>
+
+                                <span
+                                    class="text-muted"
+                                >
+
+                                    No asset
+
+                                </span>
+
+                            <?php
+
+                            }
+
+                            ?>
+
+                        </td>
+
+
+
+                        <!-- =========================
+                             PROBLEM
+                        ========================== -->
+
+                        <td>
+
+                            <?php
+
+                            if (
+                                !empty(
+                                    $row["problems"]
+                                )
+                            ) {
+
+
+                                $problem_list =
+                                    explode(
+                                        "|||",
+                                        $row["problems"]
+                                    );
+
+
+                                foreach (
+                                    $problem_list
+                                    as $problem
+                                ) {
+
+                            ?>
+
+                                <div class="mb-1">
+
+                                    <i
+                                        class="
+                                            bi
+                                            bi-dot
+                                        "
+                                    ></i>
+
+                                    <?php
+
+                                    echo htmlspecialchars(
+                                        trim($problem)
+                                    );
+
+                                    ?>
+
+                                </div>
+
+                            <?php
+
+                                }
+
+                            }
+
+                            else {
+
+                            ?>
+
+                                <span
+                                    class="text-muted"
+                                >
+
+                                    No problem specified
+
+                                </span>
+
+                            <?php
+
+                            }
+
+                            ?>
+
+                        </td>
+
+
+
+                        <!-- =========================
+                             STATUS
+                        ========================== -->
+
+                        <td>
+
+                            <span
+                                class="
+                                    status-badge
+                                    <?php
+                                    echo $status_class;
+                                    ?>
+                                "
+                            >
+
+                                <?php
+
+                                echo htmlspecialchars(
+                                    $status
+                                );
+
+                                ?>
+
+                            </span>
+
+                        </td>
+
+
+
+                        <!-- =========================
+                             ACTION
+                        ========================== -->
+
+                        <td>
+
+                            <div
+                                class="
+                                    d-flex
+                                    gap-2
+                                    flex-wrap
+                                "
+                            >
+
+
+                                <!-- VIEW -->
 
                                 <a
-                                    href="edit_complaint.php?id=<?php echo $row["id"]; ?>"
-                                    class="btn btn-primary btn-sm">
+                                    href="edit_complaint.php?id=<?php
 
-                                    View / Edit
+                                        echo $row["id"];
+
+                                    ?>"
+                                    class="
+                                        btn
+                                        btn-primary
+                                        btn-sm
+                                    "
+                                >
+
+                                    <i
+                                        class="
+                                            bi
+                                            bi-eye
+                                        "
+                                    ></i>
+
+                                    View
 
                                 </a>
 
 
+                                <!-- DELETE -->
+
                                 <a
-                                    href="delete_complaint.php?id=<?php echo $row["id"]; ?>"
-                                    class="btn btn-danger btn-sm"
-                                    onclick="return confirm('Are you sure you want to delete this complaint?');">
+                                    href="delete_complaint.php?id=<?php
+                                        echo $row["id"];
+                                    ?>"
+                                    class="
+                                        btn
+                                        btn-outline-danger
+                                        btn-sm
+                                    "
+                                >
+
+                                    <i
+                                        class="
+                                            bi
+                                            bi-trash
+                                        "
+                                    ></i>
 
                                     Delete
 
                                 </a>
 
-                            </td>
+                            </div>
 
-                        </tr>
+                        </td>
 
-                    <?php
 
-                        }
+                    </tr>
 
-                    } else {
 
-                    ?>
-
-                        <tr>
-
-                            <td colspan="5" class="text-center">
-
-                                No complaints found.
-
-                            </td>
-
-                        </tr>
-
-                    <?php
+                <?php
 
                     }
 
-                    ?>
+                }
+
+                else {
+
+                ?>
+
+
+                    <tr>
+
+                        <td
+                            colspan="8"
+                            class="text-center"
+                        >
+
+
+                            <div class="py-5">
+
+
+                                <i
+                                    class="
+                                        bi
+                                        bi-inbox
+                                        fs-1
+                                        text-muted
+                                    "
+                                ></i>
+
+
+                                <p class="mt-3 mb-2">
+
+                                    <?php
+
+                                    if (
+                                        $category_filter !== ""
+                                        ||
+                                        $asset_filter !== ""
+                                        ||
+                                        $status_filter !== ""
+                                        ||
+                                        $search !== ""
+                                    ) {
+
+                                        echo
+                                        "No complaints match your filters.";
+
+                                    }
+
+                                    else {
+
+                                        echo
+                                        "No complaints found.";
+
+                                    }
+
+                                    ?>
+
+                                </p>
+
+
+
+                                <?php
+
+                                if (
+                                    $category_filter !== ""
+                                    ||
+                                    $asset_filter !== ""
+                                    ||
+                                    $status_filter !== ""
+                                    ||
+                                    $search !== ""
+                                ) {
+
+                                ?>
+
+                                    <a
+                                        href="all_complaints.php"
+                                        class="
+                                            btn
+                                            btn-outline-primary
+                                            btn-sm
+                                        "
+                                    >
+
+                                        Clear Filters
+
+                                    </a>
+
+                                <?php
+
+                                }
+
+
+                                ?>
+
+                            </div>
+
+
+                        </td>
+
+                    </tr>
+
+
+                <?php
+
+                }
+
+                ?>
+
 
                 </tbody>
 
@@ -392,7 +1284,9 @@ $run = mysqli_query($conn, $query);
 
     </div>
 
+
 </div>
+
 
 
 <?php

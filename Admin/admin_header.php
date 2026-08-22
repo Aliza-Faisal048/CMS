@@ -12,9 +12,9 @@ if (!isset($_SESSION['testing'])) {
 }
 
 
-// Only students can access these pages
+// Only admins can access these pages
 
-if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'hr_admin') {
     echo "Access Denied";
     exit();
 
@@ -61,7 +61,9 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
 
         <div class="navbar-logo">
             <img src="../images/logo.png" alt="CMS Logo">
-            <span>Complaint Management System</span>
+            <a href="dashboard.php" class="text-decoration-none">
+                Complaint Management System
+            </a>
         </div>
 
         <a href="../logout.php" class="logout-btn">
