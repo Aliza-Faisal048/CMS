@@ -445,7 +445,7 @@ if ($user_run && mysqli_num_rows($user_run) > 0) {
 
                 </h5>
 
-                <div style="height: 300px;">
+                <div class="chart-container" style="height: 300px;">
 
                     <canvas id="statusChart"></canvas>
 
@@ -469,7 +469,7 @@ if ($user_run && mysqli_num_rows($user_run) > 0) {
 
                 </h5>
 
-                <div style="height: 300px;">
+                <div class="chart-container" style="height: 300px;">
 
                     <canvas id="categoryChart"></canvas>
 

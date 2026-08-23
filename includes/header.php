@@ -48,7 +48,9 @@ if (
 <body>
 
 <nav class="top-navbar">
-
+    <button type="button" class="mobile-menu-btn" id="mobileMenuBtn">
+    <i class="bi bi-list"></i>
+    </button>
     <div class="navbar-logo">
 
         <img

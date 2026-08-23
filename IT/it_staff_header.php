@@ -66,7 +66,14 @@ if (
 
 
     <div class="navbar-logo">
-
+        <!-- Mobile Menu Button -->
+        <button
+            type="button"
+            class="navbar-menu-btn"
+            id="navbarMenuBtn"
+            aria-label="Open menu">
+            <i class="fas fa-bars"></i>
+        </button>
         <img
             src="../images/logo.png"
             alt="CMS Logo"

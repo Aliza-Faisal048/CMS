@@ -185,3 +185,5 @@ $name = $user["name"];
     </div>
 
 </div>
+
+<div class="sidebar-overlay" id="sidebarOverlay"></div>

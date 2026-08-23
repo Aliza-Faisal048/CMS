@@ -1350,3 +1350,607 @@ footer {
 
     margin-top: 20px;
 }
+/* =========================================================
+   MOBILE NAVBAR MENU BUTTON
+   ========================================================= */
+
+.navbar-menu-btn {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    padding: 0;
+    color: #ffffff;
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.navbar-menu-btn:hover {
+    color: #ffffff;
+    background: linear-gradient(
+        135deg,
+        #2563eb,
+        #7c3aed
+    );
+    border-color: transparent;
+}
+
+.navbar-menu-btn i {
+    font-size: 19px;
+}
+
+
+/* =========================================================
+   SIDEBAR OVERLAY
+   ========================================================= */
+
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 70px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(15, 23, 42, 0.55);
+    z-index: 1400;
+}
+
+.sidebar-overlay.show {
+    display: block;
+}
+
+
+/* =========================================================
+   TABLET RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 992px) {
+
+    .top-navbar {
+        height: 70px !important;
+        padding: 0 20px !important;
+    }
+
+    .sidebar {
+        width: 220px !important;
+    }
+
+    .main-content {
+        margin-left: 220px !important;
+        padding:
+            95px
+            20px
+            35px
+            20px !important;
+    }
+
+    .navbar-logo {
+        font-size: 16px;
+    }
+
+    .navbar-logo img {
+        width: 40px !important;
+        height: 40px !important;
+    }
+
+    .top-header {
+        padding: 20px;
+    }
+
+    .content-card {
+        padding: 20px;
+    }
+
+    .stat-card {
+        min-height: 115px;
+        padding: 18px;
+    }
+
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+}
+
+
+/* =========================================================
+   MOBILE — 768px
+   ========================================================= */
+
+@media (max-width: 768px) {
+
+    /* -----------------------------
+       NAVBAR
+       ----------------------------- */
+
+    .top-navbar {
+        height: 70px !important;
+        padding: 0 15px !important;
+    }
+
+    .navbar-menu-btn {
+        display: inline-flex !important;
+        flex-shrink: 0;
+    }
+
+    .navbar-logo {
+        gap: 8px !important;
+        font-size: 15px;
+    }
+
+    .navbar-logo img {
+        width: 38px !important;
+        height: 38px !important;
+    }
+
+    .navbar-logo span {
+        display: none;
+    }
+
+    .logout-btn {
+        padding: 8px 11px !important;
+        font-size: 13px;
+    }
+
+    .logout-btn i {
+        margin-right: 0 !important;
+    }
+
+    .logout-btn span {
+        display: none;
+    }
+
+
+    /* -----------------------------
+       SIDEBAR
+       ----------------------------- */
+
+    .sidebar {
+        position: fixed !important;
+        top: 70px !important;
+        left: 0 !important;
+        bottom: 0 !important;
+
+        width: 245px !important;
+        height: calc(100vh - 70px) !important;
+
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+
+        z-index: 1500 !important;
+
+        box-shadow:
+            8px 0 25px rgba(15, 23, 42, 0.25);
+    }
+
+    .sidebar.show {
+        transform: translateX(0);
+    }
+
+
+    /* -----------------------------
+       MAIN CONTENT
+       ----------------------------- */
+
+    .main-content {
+        width: 100% !important;
+        margin-left: 0 !important;
+
+        padding:
+            90px
+            15px
+            30px
+            15px !important;
+    }
+
+
+    /* -----------------------------
+       TOP HEADER
+       ----------------------------- */
+
+    .top-header {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 12px;
+
+        padding: 17px !important;
+        margin-bottom: 18px;
+    }
+
+    .top-header h4 {
+        font-size: 19px;
+    }
+
+    .top-header small {
+        font-size: 12px;
+    }
+
+    .top-header > div:last-child {
+        align-self: flex-start;
+    }
+
+
+    /* -----------------------------
+       CONTENT CARDS
+       ----------------------------- */
+
+    .content-card {
+        padding: 16px !important;
+        margin-bottom: 18px;
+        border-radius: 10px;
+    }
+
+    .content-card h2 {
+        font-size: 21px;
+    }
+
+    .content-card h3 {
+        font-size: 19px;
+    }
+
+    .content-card h4 {
+        font-size: 17px;
+    }
+
+
+    /* -----------------------------
+       STATISTICS
+       ----------------------------- */
+
+    .stat-card {
+        min-height: 110px;
+        padding: 17px;
+    }
+
+    .stat-icon {
+        width: 43px;
+        height: 43px;
+        border-radius: 9px;
+    }
+
+    .stat-icon i {
+        font-size: 18px;
+    }
+
+
+    /* -----------------------------
+       FORMS
+       ----------------------------- */
+
+    .form-control,
+    .form-select {
+        width: 100%;
+        padding: 10px 11px;
+        font-size: 14px;
+    }
+
+    .form-label {
+        font-size: 14px;
+    }
+
+
+    /* -----------------------------
+       BUTTONS
+       ----------------------------- */
+
+    .btn-main,
+    .btn-primary,
+    .btn-secondary,
+    .btn-danger,
+    .btn-outline-primary {
+        font-size: 13px;
+        padding: 8px 12px;
+    }
+
+
+    /* -----------------------------
+       TABLE
+       ----------------------------- */
+
+    .table-responsive {
+        width: 100%;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .table-responsive .table {
+        min-width: 700px;
+    }
+
+    .table-responsive .table thead th {
+        padding: 11px 12px;
+        font-size: 12px;
+    }
+
+    .table-responsive .table tbody td {
+        padding: 11px 12px;
+        font-size: 12px;
+    }
+
+    .table-responsive .btn {
+        font-size: 11px;
+        padding: 5px 8px;
+    }
+
+
+    /* -----------------------------
+       STATUS BADGES
+       ----------------------------- */
+
+    .status-badge {
+        padding: 4px 9px;
+        font-size: 11px;
+    }
+
+
+    /* -----------------------------
+       MODAL
+       ----------------------------- */
+
+    .modal-dialog {
+        margin: 10px;
+    }
+
+    .modal-content {
+        border-radius: 10px;
+    }
+
+    .modal-header {
+        padding: 14px 16px;
+    }
+
+    .modal-body {
+        padding: 16px;
+    }
+
+    .modal-footer {
+        padding: 12px 16px;
+    }
+
+
+    /* -----------------------------
+       COMPLAINT DETAILS
+       ----------------------------- */
+
+    .complaint-detail-box {
+        padding: 12px;
+        font-size: 13px;
+    }
+
+    .admin-remarks {
+        padding: 12px;
+        font-size: 13px;
+    }
+
+    .status-update-box {
+        padding: 14px;
+    }
+
+
+    /* -----------------------------
+       CHARTS
+       ----------------------------- */
+
+    .chart-card {
+        min-height: 320px;
+    }
+
+    .chart-container {
+        height: 230px;
+        margin-top: 15px;
+    }
+}
+
+
+/* =========================================================
+   SMALL PHONE — 576px
+   ========================================================= */
+
+@media (max-width: 576px) {
+
+    .top-navbar {
+        height: 64px !important;
+        padding: 0 10px !important;
+    }
+
+    .navbar-menu-btn {
+        width: 38px;
+        height: 38px;
+    }
+
+    .navbar-menu-btn i {
+        font-size: 17px;
+    }
+
+    .navbar-logo {
+        font-size: 14px;
+    }
+
+    .navbar-logo img {
+        width: 35px !important;
+        height: 35px !important;
+    }
+
+    .logout-btn {
+        min-width: 38px;
+        height: 38px;
+        padding: 7px !important;
+    }
+
+
+    /* Sidebar */
+
+    .sidebar {
+        top: 64px !important;
+        width: 250px !important;
+        height: calc(100vh - 64px) !important;
+    }
+
+    .sidebar-overlay {
+        top: 64px;
+    }
+
+
+    /* Main */
+
+    .main-content {
+        margin-left: 0 !important;
+
+        padding:
+            80px
+            10px
+            25px
+            10px !important;
+    }
+
+
+    /* Header */
+
+    .top-header {
+        padding: 14px !important;
+        margin-bottom: 15px;
+    }
+
+    .top-header h4 {
+        font-size: 17px;
+    }
+
+
+    /* Cards */
+
+    .content-card {
+        padding: 13px !important;
+        margin-bottom: 15px;
+    }
+
+    .stat-card {
+        min-height: 105px;
+        padding: 14px;
+    }
+
+
+    /* Profile */
+
+    .sidebar-profile img,
+    .profile-placeholder {
+        width: 62px !important;
+        height: 62px !important;
+        min-width: 62px !important;
+        min-height: 62px !important;
+    }
+
+
+    /* Sidebar menu */
+
+    .sidebar-menu a {
+        padding: 11px 12px !important;
+        font-size: 13px !important;
+    }
+
+    .sidebar-menu a i {
+        font-size: 16px !important;
+    }
+
+
+    /* Forms */
+
+    .form-control,
+    .form-select {
+        font-size: 13px;
+        padding: 9px 10px;
+    }
+
+
+    /* Buttons */
+
+    .btn-main,
+    .btn-primary,
+    .btn-secondary,
+    .btn-danger,
+    .btn-outline-primary {
+        font-size: 12px;
+        padding: 7px 10px;
+    }
+
+
+    /* Tables */
+
+    .table-responsive {
+        border-radius: 8px;
+    }
+
+    .table-responsive .table {
+        min-width: 650px;
+    }
+
+
+    /* Modal */
+
+    .modal-dialog {
+        margin: 7px;
+    }
+
+    .modal-header .modal-title {
+        font-size: 16px;
+    }
+
+    .modal-body {
+        font-size: 13px;
+    }
+
+
+    /* Charts */
+
+    .chart-card {
+        min-height: 290px;
+    }
+
+    .chart-container {
+        height: 210px;
+    }
+}
+
+
+/* =========================================================
+   VERY SMALL PHONES — 400px
+   ========================================================= */
+
+@media (max-width: 400px) {
+
+    .navbar-logo img {
+        width: 32px !important;
+        height: 32px !important;
+    }
+
+    .navbar-menu-btn {
+        width: 36px;
+        height: 36px;
+    }
+
+    .logout-btn {
+        width: 36px;
+        height: 36px;
+    }
+
+    .main-content {
+        padding-left: 8px !important;
+        padding-right: 8px !important;
+    }
+
+    .content-card {
+        padding: 11px !important;
+    }
+
+    .stat-card {
+        padding: 12px;
+    }
+
+    .top-header {
+        padding: 12px !important;
+    }
+}

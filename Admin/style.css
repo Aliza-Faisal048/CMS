@@ -1174,3 +1174,748 @@ footer {
     height: 280px;
     margin-top: 20px;
 }
+/* =========================================================
+   ADMIN PANEL - RESPONSIVE DESIGN
+   ========================================================= */
+
+
+/* =========================================================
+   TABLET
+   769px - 991px
+   ========================================================= */
+
+@media (max-width: 991px) {
+
+    /* ---------- SIDEBAR ---------- */
+
+    .sidebar {
+        width: 210px !important;
+        overflow-x: hidden !important;
+        overflow-y: auto !important;
+    }
+
+    /* ---------- MAIN CONTENT ---------- */
+
+    .main-content {
+        margin-left: 210px !important;
+        width: calc(100% - 210px) !important;
+        padding: 95px 20px 30px 20px !important;
+    }
+
+    /* ---------- NAVBAR ---------- */
+
+    .top-navbar {
+        padding: 0 20px !important;
+    }
+
+    .navbar-logo span {
+        font-size: 15px;
+    }
+
+    /* ---------- CARDS ---------- */
+
+    .content-card {
+        padding: 20px;
+    }
+
+    .stat-card {
+        min-height: 115px;
+        padding: 18px;
+    }
+
+    /* ---------- CHARTS ---------- */
+
+    .chart-card {
+        min-height: 350px;
+    }
+
+    .chart-container {
+        height: 260px;
+    }
+
+}
+
+
+/* =========================================================
+   MOBILE
+   576px - 768px
+   ========================================================= */
+
+@media (max-width: 768px) {
+
+    /* ---------- NAVBAR ---------- */
+
+    .top-navbar {
+        height: 65px !important;
+        padding: 0 15px !important;
+    }
+
+    .navbar-logo {
+        gap: 8px !important;
+        font-size: 15px !important;
+    }
+
+    .navbar-logo img {
+        width: 38px !important;
+        height: 38px !important;
+    }
+
+    .logout-btn {
+        padding: 8px 12px !important;
+        font-size: 13px !important;
+    }
+
+
+    /* ---------- SIDEBAR ---------- */
+
+    .sidebar {
+        top: 65px !important;
+        width: 190px !important;
+        height: calc(100vh - 65px) !important;
+        padding: 15px 10px !important;
+    }
+
+
+    /* Sidebar header */
+
+    .sidebar-header {
+        padding: 8px 8px 15px !important;
+    }
+
+    .sidebar-header h4 {
+        font-size: 16px !important;
+    }
+
+    .sidebar-header p {
+        font-size: 11px !important;
+    }
+
+
+    /* Sidebar profile */
+
+    .sidebar-profile {
+        padding: 15px 8px !important;
+    }
+
+    .sidebar-profile img,
+    .profile-placeholder {
+        width: 60px !important;
+        height: 60px !important;
+        min-width: 60px !important;
+        min-height: 60px !important;
+    }
+
+    .sidebar-profile h6 {
+        font-size: 12px !important;
+    }
+
+
+    /* Sidebar links */
+
+    .sidebar-menu a {
+        padding: 11px 10px !important;
+        gap: 9px !important;
+        font-size: 13px !important;
+    }
+
+    .sidebar-menu a i {
+        width: 18px !important;
+        min-width: 18px !important;
+        font-size: 15px !important;
+    }
+
+
+    /* ---------- MAIN CONTENT ---------- */
+
+    .main-content {
+        margin-left: 190px !important;
+        width: calc(100% - 190px) !important;
+        padding:
+            85px
+            15px
+            25px
+            15px !important;
+    }
+
+
+    /* ---------- TOP HEADER ---------- */
+
+    .top-header {
+        padding: 18px !important;
+        margin-bottom: 18px !important;
+    }
+
+    .top-header h4 {
+        font-size: 18px !important;
+    }
+
+    .top-header small {
+        font-size: 11px !important;
+    }
+
+
+    /* ---------- CONTENT CARDS ---------- */
+
+    .content-card {
+        padding: 18px !important;
+        margin-bottom: 18px !important;
+    }
+
+
+    /* ---------- STAT CARDS ---------- */
+
+    .stat-card {
+        min-height: 105px !important;
+        padding: 17px !important;
+    }
+
+    .stat-card h2,
+    .stat-card h3,
+    .stat-card h4 {
+        font-size: 20px !important;
+    }
+
+    .stat-icon {
+        width: 42px !important;
+        height: 42px !important;
+    }
+
+    .stat-icon i {
+        font-size: 17px !important;
+    }
+
+
+    /* ---------- CHARTS ---------- */
+
+    .chart-card {
+        min-height: 320px !important;
+    }
+
+    .chart-container {
+        height: 230px !important;
+        margin-top: 15px !important;
+    }
+
+
+    /* ---------- TABLE ---------- */
+
+    .table-responsive {
+        width: 100% !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .table-responsive .table {
+        min-width: 750px;
+    }
+
+    .table-responsive .table th,
+    .table-responsive .table td {
+        padding: 10px 12px !important;
+        font-size: 12px !important;
+    }
+
+}
+
+
+/* =========================================================
+   SMALL PHONES
+   575px AND BELOW
+   ========================================================= */
+
+@media (max-width: 575px) {
+
+    /* ---------- NAVBAR ---------- */
+
+    .top-navbar {
+        height: 60px !important;
+        padding: 0 10px !important;
+    }
+
+    .navbar-logo img {
+        width: 35px !important;
+        height: 35px !important;
+    }
+
+    /* Hide logo text on very small screens */
+
+    .navbar-logo span {
+        display: none !important;
+    }
+
+    .logout-btn {
+        padding: 7px 10px !important;
+        font-size: 12px !important;
+    }
+
+
+    /* ---------- SIDEBAR ---------- */
+
+    .sidebar {
+        top: 60px !important;
+        width: 175px !important;
+        height: calc(100vh - 60px) !important;
+        padding: 12px 8px !important;
+    }
+
+
+    /* Sidebar header */
+
+    .sidebar-header {
+        padding: 6px 6px 12px !important;
+        margin-bottom: 10px !important;
+    }
+
+    .sidebar-header h4 {
+        font-size: 14px !important;
+    }
+
+    .sidebar-header p {
+        font-size: 10px !important;
+    }
+
+
+    /* Profile */
+
+    .sidebar-profile {
+        padding: 12px 5px !important;
+    }
+
+    .sidebar-profile img,
+    .profile-placeholder {
+        width: 52px !important;
+        height: 52px !important;
+        min-width: 52px !important;
+        min-height: 52px !important;
+    }
+
+    .sidebar-profile h6 {
+        font-size: 11px !important;
+    }
+
+    .sidebar-profile small {
+        font-size: 10px !important;
+    }
+
+
+    /* Menu */
+
+    .sidebar-menu {
+        gap: 3px !important;
+    }
+
+    .sidebar-menu a {
+        padding: 10px 8px !important;
+        gap: 8px !important;
+        font-size: 12px !important;
+    }
+
+    .sidebar-menu a i {
+        width: 17px !important;
+        min-width: 17px !important;
+        font-size: 14px !important;
+    }
+
+
+    /* ---------- MAIN CONTENT ---------- */
+
+    .main-content {
+        margin-left: 175px !important;
+        width: calc(100% - 175px) !important;
+        padding:
+            75px
+            10px
+            20px
+            10px !important;
+    }
+
+
+    /* ---------- TOP HEADER ---------- */
+
+    .top-header {
+        padding: 15px !important;
+        margin-bottom: 15px !important;
+    }
+
+    .top-header h4 {
+        font-size: 16px !important;
+    }
+
+    .top-header small {
+        font-size: 10px !important;
+    }
+
+
+    /* ---------- CONTENT ---------- */
+
+    .content-card {
+        padding: 15px !important;
+        border-radius: 10px !important;
+    }
+
+    .content-card h2 {
+        font-size: 20px !important;
+    }
+
+    .content-card h3 {
+        font-size: 18px !important;
+    }
+
+    .content-card h4 {
+        font-size: 16px !important;
+    }
+
+    .content-card h5 {
+        font-size: 14px !important;
+    }
+
+
+    /* ---------- STAT CARDS ---------- */
+
+    .stat-card {
+        min-height: 95px !important;
+        padding: 14px !important;
+        border-radius: 10px !important;
+    }
+
+    .stat-card h2,
+    .stat-card h3,
+    .stat-card h4 {
+        font-size: 18px !important;
+    }
+
+    .stat-card p,
+    .stat-card a {
+        font-size: 11px !important;
+    }
+
+    .stat-icon {
+        width: 38px !important;
+        height: 38px !important;
+        border-radius: 9px !important;
+    }
+
+    .stat-icon i {
+        font-size: 15px !important;
+    }
+
+
+    /* ---------- CHARTS ---------- */
+
+    .chart-card {
+        min-height: 290px !important;
+        padding: 15px !important;
+    }
+
+    .chart-container {
+        height: 210px !important;
+        margin-top: 12px !important;
+    }
+
+
+    /* ---------- TABLE ---------- */
+
+    .table-responsive {
+        border-radius: 8px !important;
+        overflow-x: auto !important;
+    }
+
+    .table-responsive .table {
+        min-width: 700px !important;
+    }
+
+    .table-responsive .table th,
+    .table-responsive .table td {
+        padding: 9px 10px !important;
+        font-size: 11px !important;
+    }
+
+
+    /* ---------- BUTTONS ---------- */
+
+    .btn-primary,
+    .btn-main,
+    .btn-secondary,
+    .btn-danger {
+        font-size: 11px !important;
+        padding: 7px 10px !important;
+    }
+
+
+    /* ---------- STATUS BADGES ---------- */
+
+    .status-badge {
+        padding: 4px 8px !important;
+        font-size: 10px !important;
+    }
+
+}
+/* =========================================================
+   SIDEBAR TOGGLE BUTTON
+   ========================================================= */
+
+.sidebar-toggle {
+    display: none;
+
+    width: 42px;
+    height: 42px;
+
+    align-items: center;
+    justify-content: center;
+
+    color: #ffffff;
+    background: #1e293b;
+
+    border: 1px solid #334155;
+    border-radius: 8px;
+
+    cursor: pointer;
+
+    font-size: 18px;
+
+    transition: all 0.2s ease;
+}
+
+.sidebar-toggle:hover {
+    background: #334155;
+}
+
+
+/* =========================================================
+   SIDEBAR MOBILE OVERLAY
+   ========================================================= */
+
+.sidebar-overlay {
+    display: none;
+}
+
+
+/* =========================================================
+   TABLET / MOBILE
+   ========================================================= */
+
+@media (max-width: 768px) {
+
+    /* Navbar */
+
+    .top-navbar {
+        height: 70px !important;
+        padding: 0 15px !important;
+    }
+
+    .sidebar-toggle {
+        display: flex;
+        flex-shrink: 0;
+        margin-right: 10px;
+    }
+
+
+    /* Logo */
+
+    .navbar-logo {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .navbar-logo span {
+        display: none;
+    }
+
+
+    /* Sidebar */
+
+    .sidebar {
+        top: 70px !important;
+        left: -260px !important;
+
+        width: 245px !important;
+        height: calc(100vh - 70px) !important;
+
+        transition: left 0.3s ease !important;
+
+        z-index: 3000 !important;
+    }
+
+
+    /* Open sidebar */
+
+    .sidebar.open {
+        left: 0 !important;
+    }
+
+
+    /* Main content */
+
+    .main-content {
+        width: 100% !important;
+
+        margin-left: 0 !important;
+
+        padding:
+            90px
+            20px
+            30px
+            20px !important;
+    }
+
+
+    /* Overlay */
+
+    .sidebar-overlay {
+        display: block;
+
+        position: fixed;
+
+        top: 70px;
+        left: 0;
+        right: 0;
+        bottom: 0;
+
+        background: rgba(15, 23, 42, 0.45);
+
+        opacity: 0;
+        visibility: hidden;
+
+        transition:
+            opacity 0.3s ease,
+            visibility 0.3s ease;
+
+        z-index: 2500;
+    }
+
+
+    .sidebar-overlay.show {
+        opacity: 1;
+        visibility: visible;
+    }
+
+
+    /* Header */
+
+    .top-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+
+    /* Cards */
+
+    .content-card {
+        padding: 18px;
+    }
+
+
+    /* Charts */
+
+    .chart-card {
+        min-height: auto;
+    }
+
+    .chart-container {
+        width: 100%;
+        height: 250px;
+    }
+
+
+    /* Tables */
+
+    .table-responsive {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+}
+
+
+/* =========================================================
+   PHONE
+   ========================================================= */
+
+@media (max-width: 576px) {
+
+    .top-navbar {
+        padding: 0 12px !important;
+    }
+
+
+    .sidebar-toggle {
+        width: 40px;
+        height: 40px;
+        margin-right: 8px;
+    }
+
+
+    .navbar-logo img {
+        width: 38px !important;
+        height: 38px !important;
+    }
+
+
+    .logout-btn {
+        padding: 8px 10px !important;
+    }
+
+    .logout-btn span {
+        display: none;
+    }
+
+
+    .main-content {
+        padding:
+            85px
+            12px
+            25px
+            12px !important;
+    }
+
+
+    .top-header {
+        padding: 17px;
+        margin-bottom: 18px;
+    }
+
+
+    .top-header h4 {
+        font-size: 18px;
+    }
+
+
+    .content-card {
+        padding: 15px;
+        border-radius: 10px;
+    }
+
+
+    .stat-card {
+        min-height: 110px;
+        padding: 17px;
+    }
+
+
+    /* Charts */
+
+    .chart-container {
+        height: 230px;
+    }
+
+
+    /* Tables */
+
+    .table-responsive {
+        border-radius: 8px;
+    }
+
+    .table-responsive .table {
+        min-width: 650px;
+    }
+
+
+    /* Complaint progress */
+
+    .complaint-progress {
+        min-width: 500px;
+    }
+
+}

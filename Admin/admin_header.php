@@ -60,6 +60,9 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'hr_admin') {
     <nav class="top-navbar">
 
         <div class="navbar-logo">
+            <button class="sidebar-toggle" id="sidebarToggle" type="button">
+                <i class="fas fa-bars"></i>
+            </button>
             <img src="../images/logo.png" alt="CMS Logo">
             <a href="dashboard.php" class="text-decoration-none">
                 Complaint Management System

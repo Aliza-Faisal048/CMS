@@ -426,7 +426,7 @@ $run = mysqli_query($conn, $query);
 
                 </h5>
 
-                <div style="height: 300px;">
+                <div class="chart-container" style="height: 300px;">
 
                     <canvas id="statusChart"></canvas>
 
@@ -450,7 +450,7 @@ $run = mysqli_query($conn, $query);
 
                 </h5>
 
-                <div style="height: 300px;">
+                <div class="chart-container" style="height: 300px;">
 
                     <canvas id="categoryChart"></canvas>
 
