@@ -43,7 +43,7 @@ $email_safe = mysqli_real_escape_string(
 
 
 /* =========================================
-   GET CURRENT USER'S PENDING COMPLAINTS
+   GET CURRENT USER'S IN PROGRESS COMPLAINTS
 ========================================= */
 
 $query = "
@@ -531,7 +531,7 @@ $run = mysqli_query(
 
                                 <p class="mt-3 mb-0">
 
-                                    You have no pending complaints.
+                                    You have no in progress complaints.
 
                                 </p>
 
