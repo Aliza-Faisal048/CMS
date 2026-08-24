@@ -40,13 +40,11 @@ function getAMSAssets($url, $apiKey, $type = null)
     $response = curl_exec($ch);
 
     if ($response === false) {
-        curl_close($ch);
         return null;
     }
 
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
-    curl_close($ch);
 
     if ($httpCode !== 200) {
         return null;
@@ -591,7 +589,7 @@ if (isset($_POST["submit-btn"])) {
                         '$asset_id_safe_cms',
                         '',
                         '$description_safe',
-                        'Unassigned',
+                        'Pending',
                         '$role_safe',
                         '$lab_safe',
                         '$asset_type_safe'
@@ -722,7 +720,7 @@ if (isset($_POST["submit-btn"])) {
                         VALUES
                         (
                             '$complaint_id',
-                            'Unassigned',
+                            'Pending',
                             '$history_email',
                             'Complaint submitted and waiting for IT staff assignment'
                         )
