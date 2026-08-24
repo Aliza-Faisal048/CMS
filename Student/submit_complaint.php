@@ -859,7 +859,7 @@ if (isset($_POST["submit-btn"])) {
 
                             ?>>
 
-                            Lab <?php echo htmlspecialchars($lab); ?>
+                            <?php echo htmlspecialchars($lab); ?>
 
                         </option>
 
