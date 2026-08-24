@@ -1,9 +1,67 @@
 <?php
 
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 session_start();
 
 include "../connection.php";
-include "../ams_connection.php";
+// =========================================
+// AMS API CONFIGURATION
+// =========================================
+
+$ams_api_url = "https://ams-production-bd97.up.railway.app/api/assets.php";
+
+$ams_api_key = getenv("AMS_API_KEY");
+
+
+// =========================================
+// GET DATA FROM AMS API
+// =========================================
+
+function getAMSAssets($url, $apiKey, $type = null)
+{
+    if ($type !== null) {
+        $url .= "?type=" . urlencode($type);
+    }
+
+    $ch = curl_init($url);
+
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_HTTPHEADER => [
+            "Authorization: Bearer " . $apiKey,
+            "Accept: application/json"
+        ],
+        CURLOPT_TIMEOUT => 15,
+        CURLOPT_SSL_VERIFYPEER => true
+    ]);
+
+    $response = curl_exec($ch);
+
+    if ($response === false) {
+        return null;
+    }
+
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+
+    if ($httpCode !== 200) {
+        return null;
+    }
+
+    $data = json_decode($response, true);
+
+    if (
+        !is_array($data) ||
+        !isset($data["success"]) ||
+        $data["success"] !== true
+    ) {
+        return null;
+    }
+
+    return $data;
+}
 
 include "../includes/header.php";
 include "../includes/sidebar.php";
@@ -35,44 +93,42 @@ $message_type = "";
 
 
 // =========================================
-// GET LABS
+// GET LABS FROM AMS API
 // =========================================
 
-$lab_query = "
-    SELECT lab_number FROM desktop
-    WHERE status = 'Serviceable'
+$ams_data = getAMSAssets(
+    $ams_api_url,
+    $ams_api_key
+);
 
-    UNION
+if ($ams_data && isset($ams_data["data"])) {
 
-    SELECT lab_number FROM laptop
-    WHERE status = 'Serviceable'
+    foreach ($ams_data["data"] as $asset_type => $asset_list) {
 
-    UNION
+        foreach ($asset_list as $asset) {
 
-    SELECT lab_number FROM printer
-    WHERE status = 'Serviceable'
+            // Only show serviceable assets
+            if (
+                isset($asset["status"]) &&
+                $asset["status"] === "Serviceable" &&
+                !empty($asset["lab"])
+            ) {
 
-    UNION
+                $labs[] = $asset["lab"];
 
-    SELECT lab_number FROM projector
-    WHERE status = 'Serviceable'
+            }
 
-    ORDER BY lab_number
-";
-
-$lab_run = mysqli_query($ams_conn, $lab_query);
-
-if ($lab_run) {
-
-    while ($row = mysqli_fetch_assoc($lab_run)) {
-
-        $labs[] = $row["lab_number"];
+        }
 
     }
 
 }
 
+// Remove duplicate labs
+$labs = array_unique($labs);
 
+// Sort labs
+sort($labs);
 // =========================================
 // KEEP SELECTED VALUES
 // =========================================
@@ -103,7 +159,7 @@ if (isset($_POST["category"])) {
 
 
 // =========================================
-// GET ASSETS
+// GET ASSETS FROM AMS API
 // =========================================
 
 if (
@@ -118,31 +174,43 @@ if (
         "projector"
     ];
 
-    if (in_array($selected_asset_type, $allowed_asset_types)) {
+    if (
+        in_array(
+            $selected_asset_type,
+            $allowed_asset_types,
+            true
+        )
+    ) {
 
-        $selected_lab_safe = mysqli_real_escape_string(
-            $ams_conn,
-            $selected_lab
+        $ams_type_data = getAMSAssets(
+            $ams_api_url,
+            $ams_api_key,
+            $selected_asset_type
         );
 
-        $asset_query = "
-            SELECT asset_tag, department
-            FROM $selected_asset_type
-            WHERE lab_number = '$selected_lab_safe'
-            AND status = 'Serviceable'
-            ORDER BY asset_tag
-        ";
+        if (
+            $ams_type_data &&
+            isset($ams_type_data["data"])
+        ) {
 
-        $asset_run = mysqli_query(
-            $ams_conn,
-            $asset_query
-        );
+            foreach (
+                $ams_type_data["data"]
+                as $asset
+            ) {
 
-        if ($asset_run) {
+                if (
+                    isset($asset["status"]) &&
+                    $asset["status"] === "Serviceable" &&
+                    isset($asset["lab"]) &&
+                    $asset["lab"] === $selected_lab
+                ) {
 
-            while ($row = mysqli_fetch_assoc($asset_run)) {
+                    $assets[] = [
+                        "asset_tag" => $asset["asset_tag"],
+                        "department" => $asset["department"]
+                    ];
 
-                $assets[] = $row;
+                }
 
             }
 
@@ -283,35 +351,56 @@ if (isset($_POST["submit-btn"])) {
 
 
             // =================================
-            // GET ASSET FROM AMS
+            // GET SELECTED ASSET FROM AMS API
             // =================================
 
-            $asset_id_safe = mysqli_real_escape_string(
-                $ams_conn,
-                $asset_id
+            $asset_data = getAMSAssets(
+                $ams_api_url,
+                $ams_api_key,
+                $asset_type
             );
 
-            $asset_query = "
-                SELECT asset_tag, department
-                FROM $asset_type
-                WHERE asset_tag = '$asset_id_safe'
-                AND lab_number = '$lab_number'
-                AND status = 'Serviceable'
-                LIMIT 1
-            ";
-
-            $asset_run = mysqli_query(
-                $ams_conn,
-                $asset_query
-            );
-
+            $asset = null;
 
             if (
-                !$asset_run ||
-                mysqli_num_rows($asset_run) == 0
+                $asset_data &&
+                isset($asset_data["data"])
             ) {
 
-                $message = "The selected asset could not be found.";
+                foreach (
+                    $asset_data["data"]
+                    as $ams_asset
+                ) {
+
+                    if (
+                        isset($ams_asset["asset_tag"]) &&
+                        $ams_asset["asset_tag"] === $asset_id &&
+                        isset($ams_asset["lab"]) &&
+                        $ams_asset["lab"] === $lab_number &&
+                        isset($ams_asset["status"]) &&
+                        $ams_asset["status"] === "Serviceable"
+                    ) {
+
+                        $asset = $ams_asset;
+
+                        break;
+
+                    }
+
+                }
+
+            }
+
+            
+
+            // =================================
+            // CHECK ASSET
+            // =================================
+
+            if ($asset === null) {
+
+                $message =
+                    "The selected asset could not be found in AMS.";
 
                 $message_type = "danger";
 
@@ -319,12 +408,7 @@ if (isset($_POST["submit-btn"])) {
 
             else {
 
-
-                $asset = mysqli_fetch_assoc(
-                    $asset_run
-                );
-
-                $department = $asset["department"];
+                $department = $asset["department"] ?? "";
 
 
                 // =================================
@@ -509,7 +593,7 @@ if (isset($_POST["submit-btn"])) {
                         '$asset_id_safe_cms',
                         '',
                         '$description_safe',
-                        'Unassigned',
+                        'Pending',
                         '$role_safe',
                         '$lab_safe',
                         '$asset_type_safe'
@@ -640,7 +724,7 @@ if (isset($_POST["submit-btn"])) {
                         VALUES
                         (
                             '$complaint_id',
-                            'Unassigned',
+                            'Pending',
                             '$history_email',
                             'Complaint submitted and waiting for IT staff assignment'
                         )
@@ -779,7 +863,7 @@ if (isset($_POST["submit-btn"])) {
 
                             ?>>
 
-                            Lab <?php echo htmlspecialchars($lab); ?>
+                            <?php echo htmlspecialchars($lab); ?>
 
                         </option>
 
