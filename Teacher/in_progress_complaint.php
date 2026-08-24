@@ -103,7 +103,7 @@ $run = mysqli_query(
 
         <div>
 
-            <i class="bi bi-clock-history fs-3"></i>
+            <i class="bi bi-arrow-repeat fs-3"></i>
 
         </div>
 
@@ -129,7 +129,7 @@ $run = mysqli_query(
 
             <h5 class="mb-0">
 
-                <i class="bi bi-clock me-2"></i>
+                <i class="bi bi-arrow-repeat me-2"></i>
 
                 My In Progress Complaints
 

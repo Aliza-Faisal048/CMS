@@ -390,6 +390,18 @@ if (!$run) {
                         >
                             Resolved
                         </option>
+                        <option
+                            value="Unserviceable"
+                            <?php
+                            echo (
+                                $status_filter === "Unserviceable"
+                            )
+                            ? "selected"
+                            : "";
+                            ?>
+                        >
+                            Unserviceable
+                        </option>
 
                     </select>
 
