@@ -2,7 +2,7 @@
 
 require_once "includes/ams_api.php";
 
-$result = getAMSAssets("desktop");
+$result = getAMSAssets("laptop");
 
 echo "<pre>";
 print_r($result);
