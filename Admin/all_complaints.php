@@ -1379,7 +1379,7 @@ $run = mysqli_query(
 
 
                 <a
-                    href="all_complaints.php?action=delete&id="
+                    href="delete_complaint.php?action=delete&id="
                     id="confirmDeleteBtn"
                     class="btn btn-danger"
                 >
