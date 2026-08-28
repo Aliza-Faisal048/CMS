@@ -1379,7 +1379,7 @@ $run = mysqli_query(
 
 
                 <a
-                    href="delete_complaint.php?action=delete&id="
+                    href="all_complaints.php?action=delete&id="
                     id="confirmDeleteBtn"
                     class="btn btn-danger"
                 >
@@ -1398,6 +1398,48 @@ $run = mysqli_query(
     </div>
 
 </div>
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const deleteModal =
+        document.getElementById("deleteModal");
+
+    const confirmDeleteBtn =
+        document.getElementById("confirmDeleteBtn");
+
+    const deleteComplaintCode =
+        document.getElementById("deleteComplaintCode");
+
+
+    deleteModal.addEventListener(
+        "show.bs.modal",
+        function (event) {
+
+            const button =
+                event.relatedTarget;
+
+            const complaintId =
+                button.getAttribute("data-id");
+
+            const complaintCode =
+                button.getAttribute("data-code");
+
+
+            deleteComplaintCode.textContent =
+                "#" + complaintCode;
+
+
+            confirmDeleteBtn.href =
+                "delete_complaint.php?id=" +
+                complaintId;
+
+        }
+    );
+
+});
+
+</script>
 
 <?php
 

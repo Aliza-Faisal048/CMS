@@ -1919,3 +1919,61 @@ footer {
     }
 
 }
+/* =========================================
+   DELETE MODAL
+========================================= */
+
+.delete-modal {
+    background: #241522;
+    color: #ffffff;
+    border: 1px solid #5b2a50;
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.delete-modal .modal-header {
+    border-bottom: 1px solid #5b2a50;
+}
+
+.delete-modal .modal-title {
+    color: #ffffff;
+}
+
+.delete-modal .modal-body {
+    padding: 30px;
+}
+
+.delete-modal .modal-footer {
+    border-top: 1px solid #5b2a50;
+}
+
+.delete-modal .text-muted {
+    color: #c9b8c7 !important;
+}
+
+.delete-icon {
+    width: 65px;
+    height: 65px;
+    margin-left: auto;
+    margin-right: auto;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: rgba(220, 53, 69, 0.15);
+
+    color: #dc3545;
+
+    font-size: 28px;
+}
+
+.delete-modal .btn-danger {
+    border-radius: 8px;
+}
+
+.delete-modal .btn-secondary {
+    border-radius: 8px;
+}
