@@ -1133,27 +1133,21 @@ $run = mysqli_query(
 
                                 <!-- DELETE -->
 
-                                <a
-                                    href="delete_complaint.php?id=<?php
-                                        echo $row["id"];
-                                    ?>"
-                                    class="
-                                        btn
-                                        btn-outline-danger
-                                        btn-sm
-                                    "
+                                <!-- DELETE BUTTON -->
+
+                                <button
+                                    type="button"
+                                    class="btn btn-outline-danger btn-sm"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#deleteModal"
+                                    data-id="<?php echo $row["id"]; ?>"
+                                    data-code="<?php echo htmlspecialchars(
+                                        $row["complaint_code"] ?: $row["id"]
+                                    ); ?>"
                                 >
-
-                                    <i
-                                        class="
-                                            bi
-                                            bi-trash
-                                        "
-                                    ></i>
-
+                                    <i class="bi bi-trash"></i>
                                     Delete
-
-                                </a>
+                                </button>
 
                             </div>
 
@@ -1287,7 +1281,123 @@ $run = mysqli_query(
 
 </div>
 
+<!-- =========================================
+     DELETE CONFIRMATION MODAL
+========================================= -->
 
+<div
+    class="modal fade"
+    id="deleteModal"
+    tabindex="-1"
+    aria-labelledby="deleteModalLabel"
+    aria-hidden="true"
+>
+
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content delete-modal">
+
+
+            <!-- HEADER -->
+
+            <div class="modal-header">
+
+                <h5
+                    class="modal-title"
+                    id="deleteModalLabel"
+                >
+
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+
+                    Delete Complaint
+
+                </h5>
+
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                ></button>
+
+            </div>
+
+
+            <!-- BODY -->
+
+            <div class="modal-body text-center">
+
+                <div class="delete-icon mb-3">
+
+                    <i class="bi bi-trash3"></i>
+
+                </div>
+
+
+                <h5>
+                    Are you sure?
+                </h5>
+
+
+                <p class="text-muted mb-2">
+
+                    You are about to delete complaint
+
+                    <strong id="deleteComplaintCode"></strong>.
+
+                </p>
+
+
+                <p class="text-muted small mb-0">
+
+                    This will also delete its problem details
+                    and status history.
+
+                    <br>
+
+                    <strong>This action cannot be undone.</strong>
+
+                </p>
+
+            </div>
+
+
+            <!-- FOOTER -->
+
+            <div class="modal-footer">
+
+                <button
+                    type="button"
+                    class="btn btn-secondary"
+                    data-bs-dismiss="modal"
+                >
+
+                    Cancel
+
+                </button>
+
+
+                <a
+                    href="#"
+                    id="confirmDeleteBtn"
+                    class="btn btn-danger"
+                >
+
+                    <i class="bi bi-trash3 me-1"></i>
+
+                    Delete Complaint
+
+                </a>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+</div>
 
 <?php
 
