@@ -357,7 +357,6 @@ if (isset($_POST["login-btn"])) {
 
 <head>
 
-```
 <meta charset="UTF-8">
 
 <meta
@@ -556,11 +555,25 @@ if (isset($_POST["login-btn"])) {
 
     <p class="footer-text">
 
-        University Complaint Management System
+    University Complaint Management System
 
-        &copy;
+    &copy;
 
-        <?php echo date("Y"); ?>
+    <?php echo date("Y"); ?>
+
+    </p>
+
+
+    <p class="signup-text">
+
+        Don't have an account?
+
+        <a
+            href="https://ums-production-34b4.up.railway.app/signup.php"
+            target="_blank"
+        >
+            Sign up
+        </a>
 
     </p>
 
