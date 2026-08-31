@@ -1,10 +1,22 @@
 <?php
 
-include_once "connection.php";
 session_start();
 
 
-/* If user is already logged in */
+/* =========================================
+   UMS API SETTINGS
+========================================= */
+
+$ums_login_url =
+    "https://ums-production-34b4.up.railway.app/api/login.php";
+
+$ums_api_token =
+    "123456789";
+
+
+/* =========================================
+   IF USER IS ALREADY LOGGED IN
+========================================= */
 
 if (isset($_SESSION["testing"])) {
 
@@ -38,67 +50,300 @@ if (isset($_SESSION["testing"])) {
 }
 
 
-/* Login */
+/* =========================================
+   LOGIN
+========================================= */
+
+$login_error = "";
+
 
 if (isset($_POST["login-btn"])) {
 
-    $email = $_POST["email"];
-    $password = $_POST["password"];
-    $role = $_POST["role"];
+    $email =
+        trim($_POST["email"]);
+
+    $password =
+        $_POST["password"];
+
+    $selected_role =
+        $_POST["role"];
 
 
-    $query = "SELECT * FROM user_table
-              WHERE email='$email'
-              AND password='$password'
-              AND role='$role'";
+    /* =====================================
+       SEND LOGIN REQUEST TO UMS
+    ===================================== */
+
+    $login_data = json_encode([
+
+        "email" =>
+            $email,
+
+        "password" =>
+            $password
+
+    ]);
 
 
-    $run = mysqli_query($conn, $query);
+    $ch =
+        curl_init($ums_login_url);
 
 
-    if (mysqli_num_rows($run) > 0) {
-
-        $user = mysqli_fetch_assoc($run);
-
-
-        /* Store user information */
-
-        $_SESSION["testing"] = "testing";
-        $_SESSION["user_id"] = $user["id"];
-        $_SESSION["email"] = $user["email"];
-        $_SESSION["role"] = $user["role"];
+    curl_setopt(
+        $ch,
+        CURLOPT_POST,
+        true
+    );
 
 
-        /* Redirect according to role */
+    curl_setopt(
+        $ch,
+        CURLOPT_POSTFIELDS,
+        $login_data
+    );
 
-        if ($user["role"] === "student") {
 
-            header("Location: Student/dashboard.php");
+    curl_setopt(
+        $ch,
+        CURLOPT_HTTPHEADER,
+        [
+
+            "Content-Type: application/json",
+
+            "Authorization: Bearer " .
+            $ums_api_token
+
+        ]
+    );
+
+
+    curl_setopt(
+        $ch,
+        CURLOPT_RETURNTRANSFER,
+        true
+    );
+
+
+    $response =
+        curl_exec($ch);
+
+
+    $curl_error =
+        curl_error($ch);
+
+
+    curl_close($ch);
+
+
+    /* =====================================
+       CHECK API CONNECTION
+    ===================================== */
+
+    if ($response === false || !empty($curl_error)) {
+
+        $login_error =
+            "Unable to connect to UMS. Please try again.";
+
+    }
+
+    else {
+
+        /* Decode UMS response */
+
+        $data =
+            json_decode(
+                $response,
+                true
+            );
+
+
+        /* =================================
+           CHECK LOGIN SUCCESS
+        ================================= */
+
+        if (
+            isset($data["success"]) &&
+            $data["success"] === true
+        ) {
+
+
+            /* =============================
+               GET USER INFORMATION
+            ============================== */
+
+            if (isset($data["user"])) {
+
+                $user =
+                    $data["user"];
+
+            }
+
+            else {
+
+                $user =
+                    $data;
+
+            }
+
+
+            /* =============================
+               GET ROLE
+            ============================== */
+
+            $user_role =
+                $user["role"] ?? "";
+
+
+            /* =============================
+               CHECK SELECTED ROLE
+            ============================== */
+
+            if (
+                $selected_role !==
+                $user_role
+            ) {
+
+                $login_error =
+                    "The selected role does not match your UMS account.";
+
+            }
+
+            else {
+
+
+                /* =========================
+                   CREATE CMS SESSION
+                ========================== */
+
+                $_SESSION["testing"] =
+                    "testing";
+
+
+                $_SESSION["user_id"] =
+                    $user["id"] ?? "";
+
+
+                $_SESSION["email"] =
+                    $user["email"] ?? $email;
+
+
+                $_SESSION["role"] =
+                    $user["role"] ?? $selected_role;
+
+
+                $_SESSION["name"] =
+                    $user["name"] ?? "";
+
+
+                $_SESSION["department"] =
+                    $user["department"] ?? "";
+
+
+                $_SESSION["phone"] =
+                    $user["phone"] ?? "";
+
+
+                $_SESSION["dob"] =
+                    $user["dob"] ?? "";
+
+
+                $_SESSION["profile_picture"] =
+                    $user["profile_picture"] ?? "";
+
+
+                $_SESSION["current_semester"] =
+                    $user["current_semester"] ?? "";
+
+
+                $_SESSION["main_subject"] =
+                    $user["main_subject"] ?? "";
+
+
+                /* =========================
+                   REDIRECT ACCORDING TO ROLE
+                ========================== */
+
+                if (
+                    $user_role === "student"
+                ) {
+
+                    header(
+                        "Location: Student/dashboard.php"
+                    );
+
+                }
+
+                elseif (
+                    $user_role === "teacher"
+                ) {
+
+                    header(
+                        "Location: Teacher/dashboard.php"
+                    );
+
+                }
+
+                elseif (
+                    $user_role === "hr_admin"
+                ) {
+
+                    header(
+                        "Location: Admin/dashboard.php"
+                    );
+
+                }
+
+                elseif (
+                    $user_role === "it_staff"
+                ) {
+
+                    header(
+                        "Location: IT/dashboard.php"
+                    );
+
+                }
+
+                else {
+
+                    $login_error =
+                        "Your account has an unsupported role.";
+
+                }
+
+
+                if (empty($login_error)) {
+
+                    exit();
+
+                }
+
+            }
 
         }
-        elseif ($user["role"] === "teacher") {
 
-            header("Location: Teacher/dashboard.php");
-
-        }
-        elseif ($user["role"] === "hr_admin") {
-
-            header("Location: Admin/dashboard.php");
-
-        }
-        elseif ($user["role"] === "it_staff") {
-
-            header("Location: IT/dashboard.php");
-
-        }
         else {
 
-            header("Location: dashboard.php");
+            /* =============================
+               UMS LOGIN FAILED
+            ============================== */
+
+            if (
+                isset($data["message"]) &&
+                !empty($data["message"])
+            ) {
+
+                $login_error =
+                    $data["message"];
+
+            }
+
+            else {
+
+                $login_error =
+                    "Invalid email or password.";
+
+            }
 
         }
-
-
-        exit();
 
     }
 
@@ -107,147 +352,226 @@ if (isset($_POST["login-btn"])) {
 ?>
 
 <!DOCTYPE html>
+
 <html lang="en">
 
 <head>
 
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+```
+<meta charset="UTF-8">
 
-    <title>Login - Complaint Management System</title>
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
 
-    <!-- Bootstrap -->
-    <link href="css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+<title>
+    Login - Complaint Management System
+</title>
+
+
+<!-- Bootstrap -->
+
+<link
+    href="css/bootstrap.min.css"
+    rel="stylesheet"
+>
+
+<link
+    rel="stylesheet"
+    href="style.css"
+>
+```
 
 </head>
 
 <body>
 
-    <div class="login-card">
+```
+<div class="login-card">
 
-        <img
-            src="images/logo.png"
-            alt="CMS-Logo"
-            style="height: 50px; margin-bottom: 5px;"
+
+    <img
+        src="images/logo.png"
+        alt="CMS-Logo"
+        style="height: 50px; margin-bottom: 5px;"
+    >
+
+
+    <h2 class="login-title">
+
+        Complaint Management System
+
+    </h2>
+
+
+    <p class="login-subtitle">
+
+        Sign in to your account
+
+    </p>
+
+
+    <hr>
+
+
+    <?php if (!empty($login_error)) { ?>
+
+        <div
+            class="alert alert-danger"
+            role="alert"
         >
 
-        <h2 class="login-title">
-            Complaint Management System
-        </h2>
+            <?php
 
-        <p class="login-subtitle">
-            Sign in to your account
-        </p>
+            echo htmlspecialchars(
+                $login_error
+            );
 
-        <hr>
+            ?>
 
+        </div>
 
-        <form method="POST">
-
-            <!-- Email -->
-
-            <div class="mb-3">
-
-                <label class="form-label">
-                    Email Address
-                </label>
-
-                <input
-                    type="email"
-                    name="email"
-                    class="form-control"
-                    placeholder="you@university.edu"
-                    required
-                >
-
-            </div>
+    <?php } ?>
 
 
-            <!-- Password -->
-
-            <div class="mb-3">
-
-                <label class="form-label">
-                    Password
-                </label>
-
-                <input
-                    type="password"
-                    name="password"
-                    class="form-control"
-                    placeholder="Enter your password"
-                    required
-                >
-
-            </div>
+    <form method="POST">
 
 
-            <!-- Role -->
+        <!-- Email -->
 
-            <div class="mb-4">
+        <div class="mb-3">
 
-                <label class="form-label">
-                    Role
-                </label>
+            <label class="form-label">
 
-                <select
-                    name="role"
-                    class="form-select"
-                    required
-                >
+                Email Address
 
-                    <option value="">
-                        Choose your role
-                    </option>
-
-                    <option value="student">
-                        Student
-                    </option>
-
-                    <option value="teacher">
-                        Teacher
-                    </option>
-
-                    <option value="hr_admin">
-                        HR Admin
-                    </option>
-
-                    <option value="it_staff">
-                        IT Staff
-                    </option>
-
-                </select>
-
-            </div>
+            </label>
 
 
-            <!-- Login Button -->
-
-            <button
-                type="submit"
-                name="login-btn"
-                class="login-button"
+            <input
+                type="email"
+                name="email"
+                class="form-control"
+                placeholder="you@university.edu"
+                required
             >
 
-                Sign In
-
-            </button>
-
-        </form>
+        </div>
 
 
-        <p class="footer-text">
+        <!-- Password -->
 
-            University Complaint Management System
-            &copy; <?php echo date("Y"); ?>
+        <div class="mb-3">
 
-        </p>
+            <label class="form-label">
 
-    </div>
+                Password
+
+            </label>
 
 
-    <script src="js/bootstrap.bundle.min.js"></script>
+            <input
+                type="password"
+                name="password"
+                class="form-control"
+                placeholder="Enter your password"
+                required
+            >
+
+        </div>
+
+
+        <!-- Role -->
+
+        <div class="mb-4">
+
+            <label class="form-label">
+
+                Role
+
+            </label>
+
+
+            <select
+                name="role"
+                class="form-select"
+                required
+            >
+
+                <option value="">
+
+                    Choose your role
+
+                </option>
+
+
+                <option value="student">
+
+                    Student
+
+                </option>
+
+
+                <option value="teacher">
+
+                    Teacher
+
+                </option>
+
+
+                <option value="hr_admin">
+
+                    HR Admin
+
+                </option>
+
+
+                <option value="it_staff">
+
+                    IT Staff
+
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <!-- Login Button -->
+
+        <button
+            type="submit"
+            name="login-btn"
+            class="login-button"
+        >
+
+            Sign In
+
+        </button>
+
+
+    </form>
+
+
+    <p class="footer-text">
+
+        University Complaint Management System
+
+        &copy;
+
+        <?php echo date("Y"); ?>
+
+    </p>
+
+
+</div>
+
+
+<script
+    src="js/bootstrap.bundle.min.js"
+></script>
+```
 
 </body>
 
