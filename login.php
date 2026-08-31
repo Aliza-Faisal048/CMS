@@ -170,17 +170,17 @@ if (isset($_POST["login-btn"])) {
                GET USER INFORMATION
             ============================== */
 
-            if (isset($data["user"])) {
+            if (
+                isset($data["data"]["user"])
+            ) {
 
                 $user =
-                    $data["user"];
+                    $data["data"]["user"];
 
             }
-
             else {
 
-                $user =
-                    $data;
+                $user = [];
 
             }
 
@@ -191,12 +191,6 @@ if (isset($_POST["login-btn"])) {
 
             $user_role =
                 $user["role"] ?? "";
-
-            echo "<pre>";
-            print_r($user);
-            echo "</pre>";
-            exit();
-
 
             /* =============================
                CHECK SELECTED ROLE
