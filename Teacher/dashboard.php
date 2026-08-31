@@ -9,6 +9,7 @@ include "../includes/sidebar.php";
 
 $email = $_SESSION["email"];
 
+
 /* =========================================
    COMPLAINT STATISTICS
    ========================================= */
@@ -146,27 +147,6 @@ $query = "
 ";
 
 $run = mysqli_query($conn, $query);
-
-$user_id = $_SESSION["user_id"];
-
-$user_query = "
-    SELECT name
-    FROM user_table
-    WHERE id = '$user_id'
-    LIMIT 1
-";
-
-$user_run = mysqli_query($conn, $user_query);
-
-$name = "User";
-
-if ($user_run && mysqli_num_rows($user_run) > 0) {
-
-    $user_row = mysqli_fetch_assoc($user_run);
-
-    $name = $user_row["name"];
-
-}
 
 ?>
 
