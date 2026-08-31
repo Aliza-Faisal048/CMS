@@ -381,13 +381,13 @@ if (isset($_POST["login-btn"])) {
     rel="stylesheet"
     href="style.css"
 >
-```
+
 
 </head>
 
 <body>
 
-```
+
 <div class="login-card">
 
 
@@ -571,7 +571,7 @@ if (isset($_POST["login-btn"])) {
 <script
     src="js/bootstrap.bundle.min.js"
 ></script>
-```
+
 
 </body>
 
