@@ -1,4 +1,3 @@
-```php
 <!-- Bootstrap JavaScript -->
 
 <script
@@ -32,4 +31,4 @@ document.addEventListener("DOMContentLoaded", function () {
 </body>
 
 </html>
-```
+
