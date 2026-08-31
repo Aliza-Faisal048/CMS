@@ -187,8 +187,9 @@ $run = mysqli_query($conn, $query);
 
         <h2>
 
-            Welcome, Student
-            <i class="bi bi-backpack fs-3"></i>
+            Welcome,
+                <?php echo htmlspecialchars($_SESSION["name"]); ?>
+            <i class="bi bi-pen fs-3"></i>
 
         </h2>
 

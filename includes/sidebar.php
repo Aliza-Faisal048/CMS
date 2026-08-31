@@ -4,149 +4,205 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-include "../connection.php";
 
-$user_id = $_SESSION["user_id"];
+/* =========================================
+   USER INFORMATION FROM UMS SESSION
+========================================= */
 
-$query = "SELECT profile_picture, name
-          FROM user_table
-          WHERE id='$user_id'";
+$name =
+    $_SESSION["name"] ?? "User";
 
-$run = mysqli_query($conn, $query);
+$profile_picture =
+    $_SESSION["profile_picture"] ?? "";
 
-$user = mysqli_fetch_assoc($run);
+$role =
+    $_SESSION["role"] ?? "";
 
-$profile_picture = $user["profile_picture"];
-$current_page = basename($_SERVER['PHP_SELF']);
-$name = $user["name"];
+$current_page =
+    basename($_SERVER["PHP_SELF"]);
+
 ?>
 
 <aside class="sidebar">
 
-    <!-- SIDEBAR HEADER -->
+```
+<!-- SIDEBAR HEADER -->
 
-    <div class="sidebar-header">
+<div class="sidebar-header">
 
-        <div class="logo">
+    <div class="logo">
 
-            <i class="bi bi-chat-square-text"></i>
+        <i class="bi bi-chat-square-text"></i>
 
-            <span>CMS USER</span>
+        <span>CMS USER</span>
+
+    </div>
+
+</div>
+
+
+<!-- PROFILE -->
+
+<div class="sidebar-profile">
+
+    <?php if (!empty($profile_picture)) { ?>
+
+        <img
+            src="https://ums-production-34b4.up.railway.app/uploads/profiles/<?php echo htmlspecialchars($profile_picture); ?>"
+            alt="Profile Picture"
+        >
+
+    <?php } else { ?>
+
+        <div class="profile-placeholder">
+
+            <i class="bi bi-person"></i>
 
         </div>
 
-    </div>
+    <?php } ?>
 
 
-    <!-- PROFILE -->
+    <h6>
 
-    <div class="sidebar-profile">
+        <?php
 
-        <?php if (!empty($profile_picture)) { ?>
+        echo htmlspecialchars($name);
 
-            <img
-                src="../uploads/profiles/<?php echo htmlspecialchars($profile_picture); ?>"
-                alt="Profile Picture">
+        ?>
 
-        <?php } else { ?>
-
-            <div class="profile-placeholder">
-
-                <i class="bi bi-person"></i>
-
-            </div>
-
-        <?php } ?>
+    </h6>
 
 
-        <h6>
-            <?php echo htmlspecialchars($name); ?>
-        </h6>
+    <small>
 
-        <small>
-            <?php echo ucfirst($_SESSION["role"]); ?>
-        </small>
+        <?php
 
-    </div>
+        echo htmlspecialchars(
+            ucfirst($role)
+        );
 
+        ?>
 
-    <!-- MENU -->
+    </small>
 
-    <div class="sidebar-menu">
-
-
-        <!-- DASHBOARD -->
-
-        <a
-            href="dashboard.php"
-            class="<?php
-                echo ($current_page == 'dashboard.php')
-                    ? 'active'
-                    : '';
-            ?>"
-        >
-
-            <i class="bi bi-speedometer2"></i>
-
-            <span>
-                Dashboard
-            </span>
-        </a>
+</div>
 
 
-        <a
-            href="submit_complaint.php"
-            class="<?php
-                echo ($current_page == 'submit_complaint.php')
-                    ? 'active'
-                    : '';
-            ?>"
-        >
+<!-- MENU -->
 
-            <i class="bi bi-plus-circle"></i>
-
-            <span>
-                Launch Complaint
-            </span>
-
-        </a>
+<div class="sidebar-menu">
 
 
-        <a
-            href="track_complaints.php"
-            class="<?php
-                echo ($current_page == 'track_complaints.php')
-                    ? 'active'
-                    : '';
-            ?>"
-        >
+    <!-- DASHBOARD -->
 
-            <i class="bi bi-clock-history"></i>
+    <a
+        href="dashboard.php"
+        class="<?php
 
-            <span>
-                Track Complaints
-            </span>
+            echo (
+                $current_page ==
+                'dashboard.php'
+            )
+            ? 'active'
+            : '';
 
-        </a>
+        ?>"
+    >
+
+        <i class="bi bi-speedometer2"></i>
+
+        <span>
+
+            Dashboard
+
+        </span>
+
+    </a>
 
 
-         <a
-            href="all_complaints.php"
-            class="<?php
-                echo ($current_page == 'all_complaints.php')
-                    ? 'active'
-                    : '';
-            ?>"
-        >
+    <!-- LAUNCH COMPLAINT -->
 
-            <i class="bi bi-file-text"></i>
+    <a
+        href="submit_complaint.php"
+        class="<?php
 
-            <span>
-                All Complaints
-            </span>
+            echo (
+                $current_page ==
+                'submit_complaint.php'
+            )
+            ? 'active'
+            : '';
 
-        </a>
+        ?>"
+    >
 
-    </div>
+        <i class="bi bi-plus-circle"></i>
+
+        <span>
+
+            Launch Complaint
+
+        </span>
+
+    </a>
+
+
+    <!-- TRACK COMPLAINTS -->
+
+    <a
+        href="track_complaints.php"
+        class="<?php
+
+            echo (
+                $current_page ==
+                'track_complaints.php'
+            )
+            ? 'active'
+            : '';
+
+        ?>"
+    >
+
+        <i class="bi bi-clock-history"></i>
+
+        <span>
+
+            Track Complaints
+
+        </span>
+
+    </a>
+
+
+    <!-- ALL COMPLAINTS -->
+
+    <a
+        href="all_complaints.php"
+        class="<?php
+
+            echo (
+                $current_page ==
+                'all_complaints.php'
+            )
+            ? 'active'
+            : '';
+
+        ?>"
+    >
+
+        <i class="bi bi-file-text"></i>
+
+        <span>
+
+            All Complaints
+
+        </span>
+
+    </a>
+
+
+</div>
+```
 
 </aside>
