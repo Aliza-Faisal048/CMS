@@ -192,6 +192,11 @@ if (isset($_POST["login-btn"])) {
             $user_role =
                 $user["role"] ?? "";
 
+            echo "<pre>";
+            print_r($user);
+            echo "</pre>";
+            exit();
+
 
             /* =============================
                CHECK SELECTED ROLE
