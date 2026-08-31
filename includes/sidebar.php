@@ -25,7 +25,6 @@ $current_page =
 
 <aside class="sidebar">
 
-```
 <!-- SIDEBAR HEADER -->
 
 <div class="sidebar-header">
@@ -48,7 +47,7 @@ $current_page =
     <?php if (!empty($profile_picture)) { ?>
 
         <img
-            src="https://ums-production-34b4.up.railway.app/uploads/profiles/<?php echo htmlspecialchars($profile_picture); ?>"
+            src="https://ums-production-34b4.up.railway.app/uploads/profile_pictures/<?php echo htmlspecialchars($profile_picture); ?>"
             alt="Profile Picture"
         >
 
@@ -203,6 +202,6 @@ $current_page =
 
 
 </div>
-```
+
 
 </aside>
