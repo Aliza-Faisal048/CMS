@@ -22,50 +22,42 @@ if (
 
 
 /* =========================================
-   GET LOGGED-IN IT STAFF
+   GET LOGGED-IN IT STAFF FROM UMS SESSION
 ========================================= */
 
-$user_id = intval($_SESSION["user_id"]);
+$user_id =
+    intval($_SESSION["user_id"]);
+
+$name =
+    $_SESSION["name"] ?? "";
+
+$email =
+    $_SESSION["email"] ?? "";
+
+$department =
+    $_SESSION["department"] ?? "";
+
+$profile_picture =
+    $_SESSION["profile_picture"] ?? "";
 
 
-$staff_query = "
-    SELECT
-        id,
-        name,
-        email
-    FROM user_table
-    WHERE id = '$user_id'
-    AND role = 'it_staff'
-    LIMIT 1
-";
-
-
-$staff_run = mysqli_query(
-    $conn,
-    $staff_query
-);
-
+/* =========================================
+   VALIDATE SESSION USER
+========================================= */
 
 if (
-    !$staff_run ||
-    mysqli_num_rows($staff_run) == 0
+    empty($user_id) ||
+    empty($name) ||
+    empty($email)
 ) {
 
+    session_unset();
     session_destroy();
 
     header("Location: ../login.php");
     exit();
 
 }
-
-
-$staff = mysqli_fetch_assoc(
-    $staff_run
-);
-
-
-$name = $staff["name"];
-$email = $staff["email"];
 
 
 /* =========================================
@@ -89,18 +81,23 @@ $query = "
     WHERE assigned_to = '$staff_name_safe'
 ";
 
+$run =
+    mysqli_query(
+        $conn,
+        $query
+    );
 
-$run = mysqli_query(
-    $conn,
-    $query
-);
+$total_complaints = 0;
 
+if ($run) {
 
-$row = mysqli_fetch_assoc($run);
+    $row =
+        mysqli_fetch_assoc($run);
 
+    $total_complaints =
+        intval($row["total"] ?? 0);
 
-$total_complaints =
-    $row["total"];
+}
 
 
 /* =========================================
@@ -114,18 +111,23 @@ $query = "
     AND status = 'Pending'
 ";
 
+$run =
+    mysqli_query(
+        $conn,
+        $query
+    );
 
-$run = mysqli_query(
-    $conn,
-    $query
-);
+$pending_complaints = 0;
 
+if ($run) {
 
-$row = mysqli_fetch_assoc($run);
+    $row =
+        mysqli_fetch_assoc($run);
 
+    $pending_complaints =
+        intval($row["total"] ?? 0);
 
-$pending_complaints =
-    $row["total"];
+}
 
 
 /* =========================================
@@ -139,18 +141,23 @@ $query = "
     AND status = 'In Progress'
 ";
 
+$run =
+    mysqli_query(
+        $conn,
+        $query
+    );
 
-$run = mysqli_query(
-    $conn,
-    $query
-);
+$in_progress_complaints = 0;
 
+if ($run) {
 
-$row = mysqli_fetch_assoc($run);
+    $row =
+        mysqli_fetch_assoc($run);
 
+    $in_progress_complaints =
+        intval($row["total"] ?? 0);
 
-$in_progress_complaints =
-    $row["total"];
+}
 
 
 /* =========================================
@@ -164,18 +171,23 @@ $query = "
     AND status = 'Resolved'
 ";
 
+$run =
+    mysqli_query(
+        $conn,
+        $query
+    );
 
-$run = mysqli_query(
-    $conn,
-    $query
-);
+$resolved_complaints = 0;
 
+if ($run) {
 
-$row = mysqli_fetch_assoc($run);
+    $row =
+        mysqli_fetch_assoc($run);
 
+    $resolved_complaints =
+        intval($row["total"] ?? 0);
 
-$resolved_complaints =
-    $row["total"];
+}
 
 
 /* =========================================
@@ -189,18 +201,23 @@ $query = "
     AND status = 'Unserviceable'
 ";
 
+$run =
+    mysqli_query(
+        $conn,
+        $query
+    );
 
-$run = mysqli_query(
-    $conn,
-    $query
-);
+$unserviceable_complaints = 0;
 
+if ($run) {
 
-$row = mysqli_fetch_assoc($run);
+    $row =
+        mysqli_fetch_assoc($run);
 
+    $unserviceable_complaints =
+        intval($row["total"] ?? 0);
 
-$unserviceable_complaints =
-    $row["total"];
+}
 
 
 /* =========================================
@@ -216,29 +233,42 @@ $status_query = "
     AND status IS NOT NULL
     AND status != ''
     GROUP BY status
+    ORDER BY
+        CASE status
+            WHEN 'Pending' THEN 1
+            WHEN 'In Progress' THEN 2
+            WHEN 'Resolved' THEN 3
+            WHEN 'Unserviceable' THEN 4
+            ELSE 5
+        END
 ";
 
 
-$status_run = mysqli_query(
-    $conn,
-    $status_query
-);
+$status_run =
+    mysqli_query(
+        $conn,
+        $status_query
+    );
 
 
 $status_labels = [];
 $status_data = [];
 
 
-while (
-    $row =
-    mysqli_fetch_assoc($status_run)
-) {
+if ($status_run) {
 
-    $status_labels[] =
-        $row["status"];
+    while (
+        $row =
+        mysqli_fetch_assoc($status_run)
+    ) {
 
-    $status_data[] =
-        $row["total"];
+        $status_labels[] =
+            $row["status"];
+
+        $status_data[] =
+            intval($row["total"]);
+
+    }
 
 }
 
@@ -271,7 +301,15 @@ $recent_query = "
 
     WHERE c.assigned_to = '$staff_name_safe'
 
-    GROUP BY c.id
+    GROUP BY
+        c.id,
+        c.complaint_code,
+        c.email,
+        c.role,
+        c.c_category,
+        c.asset_id,
+        c.status,
+        c.assigned_to
 
     ORDER BY c.id DESC
 
@@ -279,10 +317,11 @@ $recent_query = "
 ";
 
 
-$recent_run = mysqli_query(
-    $conn,
-    $recent_query
-);
+$recent_run =
+    mysqli_query(
+        $conn,
+        $recent_query
+    );
 
 
 /* =========================================
@@ -290,6 +329,7 @@ $recent_run = mysqli_query(
 ========================================= */
 
 include "it_staff_header.php";
+
 include "it_staff_sidebar.php";
 
 ?>
@@ -297,7 +337,7 @@ include "it_staff_sidebar.php";
 
 <!-- =========================================
      CHART STYLING
-========================================== -->
+========================================= -->
 
 <style>
 
@@ -333,7 +373,6 @@ include "it_staff_sidebar.php";
 }
 
 </style>
-
 
 
 <div class="main-content">
@@ -373,7 +412,6 @@ include "it_staff_sidebar.php";
     </div>
 
 
-
     <!-- =====================================
          WELCOME
     ====================================== -->
@@ -383,7 +421,9 @@ include "it_staff_sidebar.php";
         <h2>
 
             Welcome,
-            <?php echo htmlspecialchars($name); ?>
+            <?php
+            echo htmlspecialchars($name);
+            ?>
 
             <i
                 class="bi bi-person-badge fs-3"
@@ -401,10 +441,9 @@ include "it_staff_sidebar.php";
     </div>
 
 
-
     <!-- =====================================
          STATISTICS
-    ====================================== -->
+    ===================================== -->
 
     <div class="row g-4">
 
@@ -470,7 +509,6 @@ include "it_staff_sidebar.php";
         </div>
 
 
-
         <!-- PENDING -->
 
         <div class="col-md-3">
@@ -530,7 +568,6 @@ include "it_staff_sidebar.php";
             </a>
 
         </div>
-
 
 
         <!-- IN PROGRESS -->
@@ -594,7 +631,6 @@ include "it_staff_sidebar.php";
         </div>
 
 
-
         <!-- RESOLVED -->
 
         <div class="col-md-3">
@@ -654,7 +690,6 @@ include "it_staff_sidebar.php";
             </a>
 
         </div>
-
 
 
         <!-- UNSERVICEABLE -->
@@ -724,13 +759,14 @@ include "it_staff_sidebar.php";
     </div>
 
 
-
     <!-- =====================================
-         STATUS CHART
+         STATUS CHART + SUMMARY
     ====================================== -->
 
     <div class="row g-4 mt-1">
 
+
+        <!-- STATUS CHART -->
 
         <div class="col-md-6">
 
@@ -785,6 +821,8 @@ include "it_staff_sidebar.php";
                 <div class="mt-4">
 
 
+                    <!-- PENDING -->
+
                     <div
                         class="
                             d-flex
@@ -812,6 +850,8 @@ include "it_staff_sidebar.php";
 
                     </div>
 
+
+                    <!-- IN PROGRESS -->
 
                     <div
                         class="
@@ -841,6 +881,8 @@ include "it_staff_sidebar.php";
                     </div>
 
 
+                    <!-- RESOLVED -->
+
                     <div
                         class="
                             d-flex
@@ -868,6 +910,8 @@ include "it_staff_sidebar.php";
 
                     </div>
 
+
+                    <!-- UNSERVICEABLE -->
 
                     <div
                         class="
@@ -899,6 +943,8 @@ include "it_staff_sidebar.php";
 
                     <hr>
 
+
+                    <!-- TOTAL -->
 
                     <div
                         class="
@@ -933,7 +979,6 @@ include "it_staff_sidebar.php";
 
 
     </div>
-
 
 
     <!-- =====================================
@@ -987,7 +1032,6 @@ include "it_staff_sidebar.php";
             </a>
 
         </div>
-
 
 
         <div class="table-responsive">
@@ -1047,7 +1091,7 @@ include "it_staff_sidebar.php";
 
 
                         $status =
-                            $row["status"];
+                            $row["status"] ?? "";
 
 
                         /* =========================
@@ -1123,7 +1167,6 @@ include "it_staff_sidebar.php";
                         </td>
 
 
-
                         <!-- SUBMITTED BY -->
 
                         <td>
@@ -1157,7 +1200,6 @@ include "it_staff_sidebar.php";
                         </td>
 
 
-
                         <!-- CATEGORY -->
 
                         <td>
@@ -1171,7 +1213,6 @@ include "it_staff_sidebar.php";
                             ?>
 
                         </td>
-
 
 
                         <!-- PROBLEM -->
@@ -1245,7 +1286,6 @@ include "it_staff_sidebar.php";
                             ?>
 
                         </td>
-
 
 
                         <!-- STATUS -->
@@ -1333,10 +1373,9 @@ include "it_staff_sidebar.php";
 </div>
 
 
-
 <!-- =========================================
      CHART.JS
-========================================== -->
+========================================= -->
 
 <script src="../js/chart.umd.min.js"></script>
 
@@ -1347,9 +1386,57 @@ include "it_staff_sidebar.php";
    STATUS CHART
 ========================================= */
 
+const statusLabels =
+    <?php
+    echo json_encode(
+        $status_labels
+    );
+    ?>;
+
+
+const statusData =
+    <?php
+    echo json_encode(
+        $status_data
+    );
+    ?>;
+
+
+const statusColors = {
+
+    "Pending":
+        "#ffc107",
+
+    "In Progress":
+        "#6d28d9",
+
+    "Resolved":
+        "#198754",
+
+    "Unserviceable":
+        "#dc3545"
+
+};
+
+
+const chartColors =
+    statusLabels.map(
+        function(status) {
+
+            return (
+                statusColors[status] ||
+                "#94a3b8"
+            );
+
+        }
+    );
+
+
 new Chart(
 
-    document.getElementById("statusChart"),
+    document.getElementById(
+        "statusChart"
+    ),
 
     {
 
@@ -1358,31 +1445,17 @@ new Chart(
         data: {
 
             labels:
-                <?php
-                echo json_encode(
-                    $status_labels
-                );
-                ?>,
+                statusLabels,
 
             datasets: [
 
                 {
 
                     data:
-                        <?php
-                        echo json_encode(
-                            $status_data
-                        );
-                        ?>,
+                        statusData,
 
-                    backgroundColor: [
-
-                        "#ffc107",
-                        "#6d28d9",
-                        "#198754",
-                        "#dc3545"
-
-                    ],
+                    backgroundColor:
+                        chartColors,
 
                     borderWidth: 0
 
@@ -1415,7 +1488,6 @@ new Chart(
 );
 
 </script>
-
 
 
 <?php

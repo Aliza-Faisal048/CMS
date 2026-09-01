@@ -11,7 +11,7 @@ $ums_login_url =
     "https://ums-production-34b4.up.railway.app/api/login.php";
 
 $ums_api_token =
-    "123456789";
+    getenv("UMS_API_KEY");
 
 
 /* =========================================
