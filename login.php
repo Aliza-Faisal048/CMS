@@ -30,7 +30,7 @@ if (isset($_SESSION["testing"])) {
         header("Location: Teacher/dashboard.php");
 
     }
-    elseif ($_SESSION["role"] === "hr_admin") {
+    elseif ($_SESSION["role"] === "hr admin") {
 
         header("Location: Admin/dashboard.php");
 
