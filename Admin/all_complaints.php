@@ -15,7 +15,7 @@ include "admin_sidebar.php";
 if (
     !isset($_SESSION["user_id"]) ||
     !isset($_SESSION["role"]) ||
-    $_SESSION["role"] !== "hr_admin"
+    $_SESSION["role"] !== "hr admin"
 ) {
 
     header("Location: ../login.php");

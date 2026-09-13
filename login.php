@@ -282,7 +282,7 @@ if (isset($_POST["login-btn"])) {
                 }
 
                 elseif (
-                    $user_role === "hr_admin"
+                    $user_role === "hr admin"
                 ) {
 
                     header(
@@ -518,7 +518,7 @@ if (isset($_POST["login-btn"])) {
                 </option>
 
 
-                <option value="hr_admin">
+                <option value="hr admin">
 
                     HR Admin
 

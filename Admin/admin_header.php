@@ -14,7 +14,7 @@ if (!isset($_SESSION['testing'])) {
 
 // Only admins can access these pages
 
-if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'hr_admin') {
+if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'hr admin') {
     echo "Access Denied";
     exit();
 
