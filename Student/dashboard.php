@@ -203,212 +203,211 @@ $run = mysqli_query($conn, $query);
 
 
 
-    <!-- STATISTICS -->
+<!-- STATISTICS -->
 
     <div class="row g-4">
 
 
-        <!-- TOTAL -->
+            <!-- TOTAL -->
 
         <div class="col-md-3">
 
-            <div class="stat-card">
+            <a
+                href="all_complaints.php"
+                class="text-decoration-none text-dark"
+            >
 
-                <div class="d-flex
-                            justify-content-between
-                            align-items-center">
+                <div class="stat-card">
 
-                    <div>
+                    <div class="d-flex
+                                justify-content-between
+                                align-items-center">
 
-                        <a
-                            href="all_complaints.php"
-                            class="text-decoration-none text-muted mb-1">
+                        <div>
 
-                            Total Complaints
+                            <span class="text-muted mb-1 d-block">
+                                Total Complaints
+                            </span>
 
-                        </a>
+                            <h4>
+                                <?php echo $total_complaints; ?>
+                            </h4>
 
-                        <h4>
-                            <?php echo $total_complaints; ?>
-                        </h4>
+                        </div>
 
-                    </div>
+                        <div class="stat-icon">
 
-                    <div class="stat-icon">
+                            <i class="bi bi-file-text"></i>
 
-                        <i class="bi bi-file-text"></i>
+                        </div>
 
                     </div>
 
                 </div>
 
-            </div>
+            </a>
 
         </div>
-
-
-
         <!-- PENDING -->
 
         <div class="col-md-3">
 
-            <div class="stat-card">
+            <a
+                href="pending_complaint.php"
+                class="text-decoration-none text-dark"
+            >
 
-                <div class="d-flex
-                            justify-content-between
-                            align-items-center">
+                <div class="stat-card">
 
-                    <div>
+                    <div class="d-flex
+                                justify-content-between
+                                align-items-center">
 
-                        <a
-                            href="pending_complaint.php"
-                            class="text-decoration-none text-muted mb-1">
+                        <div>
 
-                            Pending
+                            <span class="text-muted mb-1 d-block">
+                                Pending
+                            </span>
 
-                        </a>
+                            <h4>
+                                <?php echo $pending_complaints; ?>
+                            </h4>
 
-                        <h4>
-                            <?php echo $pending_complaints; ?>
-                        </h4>
+                        </div>
 
-                    </div>
+                        <div class="stat-icon">
 
-                    <div class="stat-icon">
+                            <i class="bi bi-clock"></i>
 
-                        <i class="bi bi-clock"></i>
+                        </div>
 
                     </div>
 
                 </div>
 
-            </div>
+            </a>
 
         </div>
-
-
-
         <!-- IN PROGRESS -->
 
         <div class="col-md-3">
 
-            <div class="stat-card">
+            <a
+                href="in_progress_complaint.php"
+                class="text-decoration-none text-dark"
+            >
 
-                <div class="d-flex
-                            justify-content-between
-                            align-items-center">
+                <div class="stat-card">
 
-                    <div>
+                    <div class="d-flex
+                                justify-content-between
+                                align-items-center">
 
-                        <a
-                            href="in_progress_complaint.php"
-                            class="text-decoration-none text-muted mb-1">
+                        <div>
 
-                            In Progress
+                            <span class="text-muted mb-1 d-block">
+                                In Progress
+                            </span>
 
-                        </a>
+                            <h4>
+                                <?php echo $in_progress_complaints; ?>
+                            </h4>
 
-                        <h4>
-                            <?php echo $in_progress_complaints; ?>
-                        </h4>
+                        </div>
 
-                    </div>
+                        <div class="stat-icon">
 
-                    <div class="stat-icon">
+                            <i class="bi bi-arrow-repeat"></i>
 
-                        <i class="bi bi-arrow-repeat"></i>
+                        </div>
 
                     </div>
 
                 </div>
 
-            </div>
+            </a>
 
         </div>
-
-
-
         <!-- RESOLVED -->
 
         <div class="col-md-3">
 
-            <div class="stat-card">
+            <a
+                href="resolved_complaints.php"
+                class="text-decoration-none text-dark"
+            >
 
-                <div class="d-flex
-                            justify-content-between
-                            align-items-center">
+                <div class="stat-card">
 
-                    <div>
+                    <div class="d-flex
+                                justify-content-between
+                                align-items-center">
 
-                        <a
-                            href="resolved_complaints.php"
-                            class="text-decoration-none text-muted mb-1">
+                        <div>
 
-                            Resolved
+                            <span class="text-muted mb-1 d-block">
+                                Resolved
+                            </span>
 
-                        </a>
+                            <h4>
+                                <?php echo $resolved_complaints; ?>
+                            </h4>
 
-                        <h4>
-                            <?php echo $resolved_complaints; ?>
-                        </h4>
+                        </div>
 
-                    </div>
+                        <div class="stat-icon">
 
-                    <div class="stat-icon">
+                            <i class="bi bi-check-circle"></i>
 
-                        <i class="bi bi-check-circle"></i>
+                        </div>
 
                     </div>
 
                 </div>
 
-            </div>
+            </a>
 
         </div>
-
-
-
         <!-- UNSERVICEABLE -->
 
         <div class="col-md-3">
 
-            <div class="stat-card">
+            <a
+                href="unserviceable_complaints.php"
+                class="text-decoration-none text-dark"
+            >
 
-                <div class="d-flex
-                            justify-content-between
-                            align-items-center">
+                <div class="stat-card">
 
-                    <div>
+                    <div class="d-flex
+                                justify-content-between
+                                align-items-center">
 
-                        <a
-                            href="unserviceable_complaints.php"
-                            class="text-decoration-none text-muted mb-1">
+                        <div>
 
-                            Unserviceable
+                            <span class="text-muted mb-1 d-block">
+                                Unserviceable
+                            </span>
 
-                        </a>
+                            <h4>
+                                <?php echo $unserviceable_complaints; ?>
+                            </h4>
 
-                        <h4>
-                            <?php echo $unserviceable_complaints; ?>
-                        </h4>
+                        </div>
 
-                    </div>
+                        <div class="stat-icon">
 
-                    <div class="stat-icon">
+                            <i class="bi bi-exclamation-triangle"></i>
 
-                        <i class="bi bi-exclamation-triangle"></i>
+                        </div>
 
                     </div>
 
                 </div>
 
-            </div>
+            </a>
 
         </div>
-
-    </div>
-
-
 
     <!-- CHARTS -->
 
