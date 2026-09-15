@@ -1,16 +1,38 @@
 <?php
-session_start();
-include "../connection.php";
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+require_once __DIR__ . "/../connection.php";
+
+if (
+    !isset($_SESSION["logged_in"]) ||
+    $_SESSION["logged_in"] !== true ||
+    ($_SESSION["role"] ?? "") !== "hr admin"
+) {
+    header("Location: ../login.php");
+    exit();
+}
 
 // Current page name
 $current_page = basename($_SERVER['PHP_SELF']);
-$user_id = $_SESSION["user_id"];
+$user_id = isset($_SESSION["user_id"]) ? (int) $_SESSION["user_id"] : 0;
 
-$query = "SELECT profile_picture, name FROM user_table WHERE id='$user_id'";
+if ($user_id <= 0) {
+    header("Location: ../logout.php");
+    exit();
+}
+
+$query = "SELECT profile_picture, name FROM user_table WHERE id='$user_id' LIMIT 1";
 
 $run = mysqli_query($conn, $query);
 
-$user = mysqli_fetch_assoc($run);
+$user = $run ? mysqli_fetch_assoc($run) : null;
+
+if (!$user) {
+    header("Location: ../logout.php");
+    exit();
+}
 
 $profile_picture = $user["profile_picture"];
 $name = $user["name"];
@@ -24,10 +46,10 @@ $name = $user["name"];
 
     <div class="sidebar-profile">
 
-        <?php if (!empty($_SESSION["profile_picture"])) { ?>
+        <?php if (!empty($profile_picture)) { ?>
 
             <img
-                src="../uploads/<?php echo htmlspecialchars($_SESSION["profile_picture"]); ?>"
+            src="https://ums-production-34b4.up.railway.app/uploads/profile_pictures/<?php echo htmlspecialchars($profile_picture); ?>"
                 alt="Profile Picture">
 
         <?php } else { ?>

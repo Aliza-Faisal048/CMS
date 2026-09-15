@@ -12,10 +12,10 @@ function getAMSAssets($type = null)
 
     $apiKey = getenv("AMS_API_KEY");
 
-    if (!$apiKey) {
+    if (!$apiKey || !function_exists("curl_init")) {
         return [
             "success" => false,
-            "message" => "AMS_API_KEY is not configured"
+            "message" => "AMS API is not configured"
         ];
     }
 
@@ -59,7 +59,7 @@ function getAMSAssets($type = null)
         ];
     }
 
-    if ($httpCode !== 200) {
+    if ($httpCode < 200 || $httpCode >= 300) {
         return [
             "success" => false,
             "message" => $data["message"] ?? "AMS API request failed",

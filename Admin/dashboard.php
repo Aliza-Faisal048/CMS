@@ -1,8 +1,10 @@
 <?php
 
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
-include "../connection.php";
+require_once __DIR__ . "/../connection.php";
 
 
 /* =========================================
@@ -10,6 +12,8 @@ include "../connection.php";
    ========================================= */
 
 if (
+    !isset($_SESSION["logged_in"]) ||
+    $_SESSION["logged_in"] !== true ||
     !isset($_SESSION["user_id"]) ||
     !isset($_SESSION["role"]) ||
     $_SESSION["role"] !== "hr admin"
@@ -32,9 +36,9 @@ $query = "
 
 $run = mysqli_query($conn, $query);
 
-$row = mysqli_fetch_assoc($run);
+$row = $run ? mysqli_fetch_assoc($run) : null;
 
-$total_complaints = $row["total"];
+$total_complaints = $row["total"] ?? 0;
 
 
 /* =========================================
@@ -49,9 +53,9 @@ $query = "
 
 $run = mysqli_query($conn, $query);
 
-$row = mysqli_fetch_assoc($run);
+$row = $run ? mysqli_fetch_assoc($run) : null;
 
-$pending_complaints = $row["total"];
+$pending_complaints = $row["total"] ?? 0;
 
 
 /* =========================================
@@ -66,9 +70,9 @@ $query = "
 
 $run = mysqli_query($conn, $query);
 
-$row = mysqli_fetch_assoc($run);
+$row = $run ? mysqli_fetch_assoc($run) : null;
 
-$in_progress_complaints = $row["total"];
+$in_progress_complaints = $row["total"] ?? 0;
 
 
 /* =========================================
@@ -83,9 +87,9 @@ $query = "
 
 $run = mysqli_query($conn, $query);
 
-$row = mysqli_fetch_assoc($run);
+$row = $run ? mysqli_fetch_assoc($run) : null;
 
-$resolved_complaints = $row["total"];
+$resolved_complaints = $row["total"] ?? 0;
 
 
 /* =========================================
@@ -100,9 +104,9 @@ $query = "
 
 $run = mysqli_query($conn, $query);
 
-$row = mysqli_fetch_assoc($run);
+$row = $run ? mysqli_fetch_assoc($run) : null;
 
-$unserviceable_complaints = $row["total"];
+$unserviceable_complaints = $row["total"] ?? 0;
 
 
 
@@ -124,11 +128,13 @@ $role_run = mysqli_query($conn, $role_query);
 $role_labels = [];
 $role_data = [];
 
+if ($role_run) {
 while ($row = mysqli_fetch_assoc($role_run)) {
 
     $role_labels[] = ucfirst($row["role"]);
     $role_data[] = $row["total"];
 
+}
 }
 
 
@@ -145,11 +151,13 @@ $category_run = mysqli_query($conn, $category_query);
 $category_labels = [];
 $category_data = [];
 
+if ($category_run) {
 while ($row = mysqli_fetch_assoc($category_run)) {
 
     $category_labels[] = $row["c_category"];
     $category_data[] = $row["total"];
 
+}
 }
 
 
@@ -168,11 +176,13 @@ $status_run = mysqli_query($conn, $status_query);
 $status_labels = [];
 $status_data = [];
 
+if ($status_run) {
 while ($row = mysqli_fetch_assoc($status_run)) {
 
     $status_labels[] = $row["status"];
     $status_data[] = $row["total"];
 
+}
 }
 
 
@@ -220,8 +230,10 @@ $recent_run = mysqli_query(
    HEADER + SIDEBAR
    ========================================= */
 
-include "admin_header.php";
-include "admin_sidebar.php";
+$name = $_SESSION["name"] ?? "Admin";
+
+require_once __DIR__ . "/admin_header.php";
+require_once __DIR__ . "/admin_sidebar.php";
 
 ?>
 
@@ -1312,6 +1324,6 @@ new Chart(
 
 <?php
 
-include "admin_footer.php";
+require_once __DIR__ . "/admin_footer.php";
 
 ?>

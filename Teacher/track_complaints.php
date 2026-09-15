@@ -2,7 +2,7 @@
 
 session_start();
 
-include "../connection.php";
+require_once __DIR__ . "/../connection.php";
 include "../includes/header.php";
 include "../includes/sidebar.php";
 

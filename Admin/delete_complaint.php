@@ -2,9 +2,23 @@
 
 session_start();
 
-include "../connection.php";
+require_once __DIR__ . "/../connection.php";
 
-$id = (int) $_GET["id"];
+if (
+    !isset($_SESSION["logged_in"]) ||
+    $_SESSION["logged_in"] !== true ||
+    ($_SESSION["role"] ?? "") !== "hr admin"
+) {
+    header("Location: ../login.php");
+    exit();
+}
+
+$id = isset($_GET["id"]) ? (int) $_GET["id"] : 0;
+
+if ($id <= 0) {
+    header("Location: all_complaints.php");
+    exit();
+}
 
 
 /* Delete related problems */

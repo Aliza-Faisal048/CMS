@@ -1,8 +1,10 @@
 <?php
 
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
-include "../connection.php";
+require_once __DIR__ . "/../connection.php";
 
 
 /* =========================================
@@ -10,17 +12,18 @@ include "../connection.php";
 ========================================= */
 
 if (
+    !isset($_SESSION["logged_in"]) ||
+    $_SESSION["logged_in"] !== true ||
     !isset($_SESSION["user_id"]) ||
-    !isset($_SESSION["role"]) ||
-    $_SESSION["role"] !== "it_staff"
+    ($_SESSION["role"] ?? "") !== "it_staff"
 ) {
 
     header("Location: ../login.php");
     exit();
 
 }
-include "it_staff_header.php";
-include "it_staff_sidebar.php";
+require_once __DIR__ . "/it_staff_header.php";
+require_once __DIR__ . "/it_staff_sidebar.php";
 
 /* =========================================
    GET IT STAFF INFORMATION
@@ -84,6 +87,12 @@ $category_filter =
         : "";
 
 
+$asset_filter =
+    isset($_GET["asset"])
+        ? trim($_GET["asset"])
+        : "";
+
+
 $status_filter =
     isset($_GET["status"])
         ? trim($_GET["status"])
@@ -126,6 +135,25 @@ $staff_name_safe =
         $conn,
         $staff_name
     );
+
+
+/* =========================================
+   GET ASSETS FOR FILTER
+========================================= */
+
+$asset_query = "
+    SELECT DISTINCT asset_id
+    FROM complaints
+    WHERE assigned_to = '$staff_name_safe'
+    AND asset_id IS NOT NULL
+    AND asset_id <> ''
+    ORDER BY asset_id ASC
+";
+
+$asset_run = mysqli_query(
+    $conn,
+    $asset_query
+);
 
 
 /* =========================================
@@ -188,6 +216,24 @@ if ($status_filter !== "") {
 
         AND c.status = '$status_safe'
 
+    ";
+
+}
+
+
+/* =========================================
+   ASSET FILTER
+========================================= */
+
+if ($asset_filter !== "") {
+
+    $asset_safe = mysqli_real_escape_string(
+        $conn,
+        $asset_filter
+    );
+
+    $query .= "
+        AND c.asset_id = '$asset_safe'
     ";
 
 }
@@ -1236,5 +1282,5 @@ $run =
 </div>
 
 <?php
-include "it_staff_footer.php";
+require_once __DIR__ . "/it_staff_footer.php";
 ?>

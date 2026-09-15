@@ -18,7 +18,7 @@ $ums_api_token =
    IF USER IS ALREADY LOGGED IN
 ========================================= */
 
-if (isset($_SESSION["testing"])) {
+if (isset($_SESSION["logged_in"]) && $_SESSION["logged_in"] === true) {
 
     if ($_SESSION["role"] === "student") {
 
@@ -60,13 +60,13 @@ $login_error = "";
 if (isset($_POST["login-btn"])) {
 
     $email =
-        trim($_POST["email"]);
+        trim($_POST["email"] ?? "");
 
     $password =
-        $_POST["password"];
+        $_POST["password"] ?? "";
 
     $selected_role =
-        $_POST["role"];
+        $_POST["role"] ?? "";
 
 
     /* =====================================
@@ -84,6 +84,9 @@ if (isset($_POST["login-btn"])) {
     ]);
 
 
+    if (!$ums_api_token || !function_exists("curl_init")) {
+        $login_error = "Login service is not configured.";
+    } else {
     $ch =
         curl_init($ums_login_url);
 
@@ -138,6 +141,8 @@ if (isset($_POST["login-btn"])) {
        CHECK API CONNECTION
     ===================================== */
 
+    $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
     if ($response === false || !empty($curl_error)) {
 
         $login_error =
@@ -145,6 +150,9 @@ if (isset($_POST["login-btn"])) {
 
     }
 
+    elseif ($http_code < 200 || $http_code >= 300) {
+        $login_error = "Login service returned an error. Please try again.";
+    }
     else {
 
         /* Decode UMS response */
@@ -161,6 +169,7 @@ if (isset($_POST["login-btn"])) {
         ================================= */
 
         if (
+            is_array($data) &&
             isset($data["success"]) &&
             $data["success"] === true
         ) {
@@ -213,8 +222,12 @@ if (isset($_POST["login-btn"])) {
                    CREATE CMS SESSION
                 ========================== */
 
+                session_regenerate_id(true);
+
                 $_SESSION["testing"] =
                     "testing";
+
+                $_SESSION["logged_in"] = true;
 
 
                 $_SESSION["user_id"] =
@@ -344,6 +357,7 @@ if (isset($_POST["login-btn"])) {
 
         }
 
+    }
     }
 
 }

@@ -2,7 +2,7 @@
 
 session_start();
 
-include "../connection.php";
+require_once __DIR__ . "/../connection.php";
 
 
 /* =========================================
@@ -374,8 +374,8 @@ $run = mysqli_query(
    HEADER + SIDEBAR
 ========================================= */
 
-include "it_header.php";
-include "it_sidebar.php";
+include "it_staff_header.php";
+include "it_staff_sidebar.php";
 
 ?>
 
@@ -1470,6 +1470,6 @@ include "it_sidebar.php";
 
 <?php
 
-include "it_footer.php";
+include "it_staff_footer.php";
 
 ?>

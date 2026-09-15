@@ -11,7 +11,8 @@ if (
 
 
 if (
-    !isset($_SESSION["testing"]) ||
+    !isset($_SESSION["logged_in"]) ||
+    $_SESSION["logged_in"] !== true ||
     !isset($_SESSION["role"]) ||
     $_SESSION["role"] !== "it_staff"
 ) {

@@ -1,11 +1,8 @@
 <?php
 
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-
 session_start();
 
-include "../connection.php";
+require_once __DIR__ . "/../connection.php";
 // =========================================
 // AMS API CONFIGURATION
 // =========================================
@@ -21,6 +18,10 @@ $ams_api_key = getenv("AMS_API_KEY");
 
 function getAMSAssets($url, $apiKey, $type = null)
 {
+    if (!$apiKey || !function_exists("curl_init")) {
+        return null;
+    }
+
     if ($type !== null) {
         $url .= "?type=" . urlencode($type);
     }
@@ -40,10 +41,12 @@ function getAMSAssets($url, $apiKey, $type = null)
     $response = curl_exec($ch);
 
     if ($response === false) {
+        curl_close($ch);
         return null;
     }
 
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
 
 
     if ($httpCode !== 200) {

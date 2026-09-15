@@ -1,13 +1,26 @@
 <?php
 
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
-include "../connection.php";
+require_once __DIR__ . "/../connection.php";
 
-include "../includes/header.php";
-include "../includes/sidebar.php";
+if (
+    !isset($_SESSION["logged_in"]) ||
+    $_SESSION["logged_in"] !== true ||
+    ($_SESSION["role"] ?? "") !== "teacher"
+) {
+    header("Location: ../login.php");
+    exit();
+}
 
-$email = $_SESSION["email"];
+$email = $_SESSION["email"] ?? "";
+$email_safe = mysqli_real_escape_string($conn, $email);
+$name = $_SESSION["name"] ?? "Teacher";
+
+require_once __DIR__ . "/../includes/header.php";
+require_once __DIR__ . "/../includes/sidebar.php";
 
 
 /* =========================================
@@ -18,64 +31,64 @@ $email = $_SESSION["email"];
 
 $query = "SELECT COUNT(*) AS total
           FROM complaints
-          WHERE email='$email'";
+          WHERE email='$email_safe'";
 
 $run = mysqli_query($conn, $query);
-$row = mysqli_fetch_assoc($run);
+$row = $run ? mysqli_fetch_assoc($run) : null;
 
-$total_complaints = $row["total"];
+$total_complaints = $row["total"] ?? 0;
 
 
 // Pending
 
 $query = "SELECT COUNT(*) AS pending
           FROM complaints
-          WHERE email='$email'
+          WHERE email='$email_safe'
           AND status='Pending'";
 
 $run = mysqli_query($conn, $query);
-$row = mysqli_fetch_assoc($run);
+$row = $run ? mysqli_fetch_assoc($run) : null;
 
-$pending_complaints = $row["pending"];
+$pending_complaints = $row["pending"] ?? 0;
 
 
 // In Progress
 
 $query = "SELECT COUNT(*) AS in_progress
           FROM complaints
-          WHERE email='$email'
+          WHERE email='$email_safe'
           AND status='In Progress'";
 
 $run = mysqli_query($conn, $query);
-$row = mysqli_fetch_assoc($run);
+$row = $run ? mysqli_fetch_assoc($run) : null;
 
-$in_progress_complaints = $row["in_progress"];
+$in_progress_complaints = $row["in_progress"] ?? 0;
 
 
 // Resolved
 
 $query = "SELECT COUNT(*) AS resolved
           FROM complaints
-          WHERE email='$email'
+          WHERE email='$email_safe'
           AND status='Resolved'";
 
 $run = mysqli_query($conn, $query);
-$row = mysqli_fetch_assoc($run);
+$row = $run ? mysqli_fetch_assoc($run) : null;
 
-$resolved_complaints = $row["resolved"];
+$resolved_complaints = $row["resolved"] ?? 0;
 
 
 // Unserviceable
 
 $query = "SELECT COUNT(*) AS unserviceable
           FROM complaints
-          WHERE email='$email'
+          WHERE email='$email_safe'
           AND status='Unserviceable'";
 
 $run = mysqli_query($conn, $query);
-$row = mysqli_fetch_assoc($run);
+$row = $run ? mysqli_fetch_assoc($run) : null;
 
-$unserviceable_complaints = $row["unserviceable"];
+$unserviceable_complaints = $row["unserviceable"] ?? 0;
 
 
 /* =========================================
@@ -88,11 +101,12 @@ $network = 0;
 
 $query = "SELECT c_category, COUNT(*) AS total
           FROM complaints
-          WHERE email='$email'
+          WHERE email='$email_safe'
           GROUP BY c_category";
 
 $run = mysqli_query($conn, $query);
 
+if ($run) {
 while ($row = mysqli_fetch_assoc($run)) {
 
     if ($row["c_category"] == "Hardware") {
@@ -113,6 +127,7 @@ while ($row = mysqli_fetch_assoc($run)) {
 
     }
 
+}
 }
 
 
@@ -137,7 +152,7 @@ $query = "
     LEFT JOIN complaint_problems cp
         ON c.id = cp.complaint_id
 
-    WHERE c.email = '$email'
+    WHERE c.email = '$email_safe'
 
     GROUP BY c.id
 
@@ -523,7 +538,7 @@ $run = mysqli_query($conn, $query);
 
                     <?php
 
-                    if (mysqli_num_rows($run) > 0) {
+                    if ($run && mysqli_num_rows($run) > 0) {
 
                         while ($complaint = mysqli_fetch_assoc($run)) {
 
@@ -869,6 +884,6 @@ new Chart(categoryChart, {
 
 <?php
 
-include "../includes/footer.php";
+require_once __DIR__ . "/../includes/footer.php";
 
 ?>

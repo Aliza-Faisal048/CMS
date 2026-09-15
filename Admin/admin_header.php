@@ -4,9 +4,9 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 // Check whether the user is logged in
 
-if (!isset($_SESSION['testing'])) {
+if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
 
-    header("Location: login.php");
+    header("Location: ../login.php");
     exit();
 
 }

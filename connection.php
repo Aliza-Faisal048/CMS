@@ -1,10 +1,10 @@
 <?php
 
-$host = getenv("MYSQLHOST");
-$port = getenv("MYSQLPORT");
-$user = getenv("MYSQLUSER");
-$password = getenv("MYSQLPASSWORD");
-$database = getenv("MYSQL_DATABASE");
+$host = getenv("MYSQLHOST") ?: "localhost";
+$port = getenv("MYSQLPORT") ?: 3306;
+$user = getenv("MYSQLUSER") ?: "root";
+$password = getenv("MYSQLPASSWORD") ?: "";
+$database = getenv("MYSQL_DATABASE") ?: getenv("MYSQLDATABASE") ?: "cms_db";
 
 $conn = mysqli_connect(
     $host,
@@ -15,7 +15,9 @@ $conn = mysqli_connect(
 );
 
 if (!$conn) {
-    die("Database connection failed: " . mysqli_connect_error());
+    die("Database connection failed. Check MYSQLHOST, MYSQLPORT, MYSQLUSER, MYSQLPASSWORD, and MYSQLDATABASE.");
 }
+
+mysqli_set_charset($conn, "utf8mb4");
 
 ?>
