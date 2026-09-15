@@ -10,7 +10,7 @@ require_once __DIR__ . "/../connection.php";
 ========================================= */
 
 if (
-    !isset($_SESSION["user_id"]) ||
+    !isset($_SESSION["email"]) ||
     !isset($_SESSION["role"]) ||
     $_SESSION["role"] !== "it_staff"
 ) {
@@ -24,9 +24,6 @@ if (
 /* =========================================
    GET LOGGED-IN IT STAFF FROM UMS SESSION
 ========================================= */
-
-$user_id =
-    intval($_SESSION["user_id"]);
 
 $name =
     $_SESSION["name"] ?? "";
@@ -46,7 +43,6 @@ $profile_picture =
 ========================================= */
 
 if (
-    empty($user_id) ||
     empty($name) ||
     empty($email)
 ) {

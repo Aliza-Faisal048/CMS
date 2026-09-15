@@ -5,6 +5,7 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 require_once __DIR__ . "/../connection.php";
+require_once __DIR__ . "/../includes/ums_users.php";
 
 
 /* =========================================
@@ -14,7 +15,7 @@ require_once __DIR__ . "/../connection.php";
 if (
     !isset($_SESSION["logged_in"]) ||
     $_SESSION["logged_in"] !== true ||
-    !isset($_SESSION["user_id"]) ||
+    !isset($_SESSION["email"]) ||
     ($_SESSION["role"] ?? "") !== "it_staff"
 ) {
 
@@ -29,31 +30,16 @@ require_once __DIR__ . "/it_staff_sidebar.php";
    GET IT STAFF INFORMATION
 ========================================= */
 
-$user_id = intval($_SESSION["user_id"]);
+$user = null;
 
+foreach (getUMSUsers("it_staff") as $ums_staff) {
+    if (strcasecmp($ums_staff["email"] ?? "", $_SESSION["email"]) === 0) {
+        $user = $ums_staff;
+        break;
+    }
+}
 
-$user_query = "
-    SELECT
-        id,
-        name,
-        email,
-        profile_picture
-    FROM user_table
-    WHERE id = '$user_id'
-    LIMIT 1
-";
-
-
-$user_run = mysqli_query(
-    $conn,
-    $user_query
-);
-
-
-if (
-    !$user_run ||
-    mysqli_num_rows($user_run) == 0
-) {
+if (!$user) {
 
     session_destroy();
 
@@ -63,18 +49,9 @@ if (
 }
 
 
-$user =
-    mysqli_fetch_assoc($user_run);
-
-
-$staff_name =
-    $user["name"];
-
-$staff_email =
-    $user["email"];
-
-$profile_picture =
-    $user["profile_picture"];
+$staff_name = $user["name"] ?? $_SESSION["name"] ?? "";
+$staff_email = $user["email"] ?? $_SESSION["email"];
+$profile_picture = $user["profile_picture"] ?? $_SESSION["profile_picture"] ?? "";
 
 
 /* =========================================

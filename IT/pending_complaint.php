@@ -3,6 +3,7 @@
 session_start();
 
 require_once __DIR__ . "/../connection.php";
+require_once __DIR__ . "/../includes/ums_users.php";
 
 
 /* =========================================
@@ -10,7 +11,7 @@ require_once __DIR__ . "/../connection.php";
 ========================================= */
 
 if (
-    !isset($_SESSION["user_id"]) ||
+    !isset($_SESSION["email"]) ||
     !isset($_SESSION["role"]) ||
     $_SESSION["role"] !== "it_staff"
 ) {
@@ -31,33 +32,16 @@ include "it_staff_sidebar.php";
    GET LOGGED-IN IT STAFF
 ========================================= */
 
-$user_id = intval(
-    $_SESSION["user_id"]
-);
+$staff = null;
 
+foreach (getUMSUsers("it_staff") as $ums_staff) {
+    if (strcasecmp($ums_staff["email"] ?? "", $_SESSION["email"]) === 0) {
+        $staff = $ums_staff;
+        break;
+    }
+}
 
-$staff_query = "
-    SELECT
-        id,
-        name,
-        email
-    FROM user_table
-    WHERE id = '$user_id'
-    AND role = 'it_staff'
-    LIMIT 1
-";
-
-
-$staff_run = mysqli_query(
-    $conn,
-    $staff_query
-);
-
-
-if (
-    !$staff_run ||
-    mysqli_num_rows($staff_run) == 0
-) {
+if (!$staff) {
 
     session_destroy();
 
@@ -67,13 +51,8 @@ if (
 }
 
 
-$staff = mysqli_fetch_assoc(
-    $staff_run
-);
-
-
-$staff_name = $staff["name"];
-$staff_email = $staff["email"];
+$staff_name = $staff["name"] ?? $_SESSION["name"] ?? "";
+$staff_email = $staff["email"] ?? $_SESSION["email"];
 
 
 /* =========================================

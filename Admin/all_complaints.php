@@ -13,7 +13,8 @@ include "admin_sidebar.php";
    ========================================= */
 
 if (
-    !isset($_SESSION["user_id"]) ||
+    !isset($_SESSION["logged_in"]) ||
+    $_SESSION["logged_in"] !== true ||
     !isset($_SESSION["role"]) ||
     $_SESSION["role"] !== "hr admin"
 ) {

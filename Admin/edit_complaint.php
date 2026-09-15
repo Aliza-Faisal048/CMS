@@ -3,6 +3,7 @@
 session_start();
 
 require_once __DIR__ . "/../connection.php";
+require_once __DIR__ . "/../includes/ums_users.php";
 
 
 /* =========================================
@@ -10,7 +11,8 @@ require_once __DIR__ . "/../connection.php";
 ========================================= */
 
 if (
-    !isset($_SESSION["user_id"]) ||
+    !isset($_SESSION["logged_in"]) ||
+    $_SESSION["logged_in"] !== true ||
     !isset($_SESSION["role"]) ||
     $_SESSION["role"] !== "hr admin"
 ) {
@@ -65,33 +67,10 @@ $message_type = "";
 
 $it_staff = [];
 
-
-$staff_query = "
-    SELECT id, name, email
-    FROM user_table
-    WHERE role = 'it_staff'
-    ORDER BY name ASC
-";
-
-
-$staff_run = mysqli_query(
-    $conn,
-    $staff_query
-);
-
-
-if ($staff_run) {
-
-    while (
-        $staff_row =
-        mysqli_fetch_assoc($staff_run)
-    ) {
-
-        $it_staff[] = $staff_row;
-
-    }
-
-}
+$it_staff = getUMSUsers("it_staff");
+usort($it_staff, function ($first, $second) {
+    return strcasecmp($first["name"] ?? "", $second["name"] ?? "");
+});
 
 
 /* =========================================
@@ -206,38 +185,13 @@ if (isset($_POST["update-btn"])) {
 
             if ($assigned_to != "") {
 
-                $assigned_to_safe =
-                    mysqli_real_escape_string(
-                        $conn,
-                        $assigned_to
-                    );
+                $staff_exists = false;
 
-
-                $staff_check_query = "
-                    SELECT name
-                    FROM user_table
-                    WHERE name = '$assigned_to_safe'
-                    AND role = 'it_staff'
-                    LIMIT 1
-                ";
-
-
-                $staff_check_run =
-                    mysqli_query(
-                        $conn,
-                        $staff_check_query
-                    );
-
-
-                if (
-                    !$staff_check_run ||
-                    mysqli_num_rows(
-                        $staff_check_run
-                    ) == 0
-                ) {
-
-                    $staff_exists = false;
-
+                foreach ($it_staff as $staff) {
+                    if (($staff["name"] ?? "") === $assigned_to) {
+                        $staff_exists = true;
+                        break;
+                    }
                 }
 
             }
