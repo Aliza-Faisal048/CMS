@@ -84,8 +84,10 @@ if (isset($_POST["login-btn"])) {
     ]);
 
 
-    if (!$ums_api_token || !function_exists("curl_init")) {
-        $login_error = "Login service is not configured.";
+    if (empty($login_error)) {
+
+        if (!$ums_api_token || !function_exists("curl_init")) {
+            $login_error = "Login service is not configured.";
     } else {
     $ch =
         curl_init($ums_login_url);
@@ -134,6 +136,9 @@ if (isset($_POST["login-btn"])) {
         curl_error($ch);
 
 
+    $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+
     curl_close($ch);
 
 
@@ -141,17 +146,11 @@ if (isset($_POST["login-btn"])) {
        CHECK API CONNECTION
     ===================================== */
 
-    $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-
     if ($response === false || !empty($curl_error)) {
 
         $login_error =
             "Unable to connect to UMS. Please try again.";
 
-    }
-
-    elseif ($http_code < 200 || $http_code >= 300) {
-        $login_error = "Login service returned an error. Please try again.";
     }
     else {
 
@@ -359,6 +358,8 @@ if (isset($_POST["login-btn"])) {
 
     }
     }
+
+}
 
 }
 
