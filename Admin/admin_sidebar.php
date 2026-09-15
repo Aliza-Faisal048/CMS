@@ -18,24 +18,19 @@ if (
 $current_page = basename($_SERVER['PHP_SELF']);
 $user_id = isset($_SESSION["user_id"]) ? (int) $_SESSION["user_id"] : 0;
 
-if ($user_id <= 0) {
-    header("Location: ../logout.php");
-    exit();
+$profile_picture = $_SESSION["profile_picture"] ?? "";
+$name = $_SESSION["name"] ?? "";
+
+if ($user_id > 0) {
+    $query = "SELECT profile_picture, name FROM user_table WHERE id='$user_id' LIMIT 1";
+    $run = mysqli_query($conn, $query);
+    $user = $run ? mysqli_fetch_assoc($run) : null;
+
+    if ($user) {
+        $profile_picture = $user["profile_picture"] ?? $profile_picture;
+        $name = $user["name"] ?? $name;
+    }
 }
-
-$query = "SELECT profile_picture, name FROM user_table WHERE id='$user_id' LIMIT 1";
-
-$run = mysqli_query($conn, $query);
-
-$user = $run ? mysqli_fetch_assoc($run) : null;
-
-if (!$user) {
-    header("Location: ../logout.php");
-    exit();
-}
-
-$profile_picture = $user["profile_picture"];
-$name = $user["name"];
 ?>
 
 <div class="sidebar">
